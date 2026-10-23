@@ -24,3 +24,6 @@ ladder-src-03, 03b, 04, 04b, 05, 06, 08, 09: people, objects or too abstract. Ke
 Pexels is only reachable through the browser pane in the Claude desktop app, not from a shell.
 Search portrait videos: `https://www.pexels.com/search/videos/QUERY/?orientation=portrait`
 Good queries: night drive highway, car driving at night, rainy road night car, city at night aerial, tunnel lights night drive.
+
+## Pexels batch, 2026-10-23 (pex-*.mp4)
+59 night clips with cars, roads and city lights, picked from a contact sheet. Text placement per clip is in `clips/clips.json` (guessed from brightness by `toolkit/clipinfo.py`; fix it there when a render shows a problem).
