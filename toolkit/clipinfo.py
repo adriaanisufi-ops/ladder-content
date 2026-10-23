@@ -1,6 +1,6 @@
 """Add new clips in clips/ to clips/clips.json with text placement guessed from brightness.
 
-    python3 -I tools/clipinfo.py <repo_root>
+    python3 -I toolkit/clipinfo.py <repo_root>
 
 For every clip not yet in clips.json: samples 5 frames, measures how bright the upper text
 area (y 250..700) and the lower text area (y 1100..1550) are, puts the text in the darker one,
@@ -39,10 +39,10 @@ for f in sorted(os.listdir(os.path.join(ROOT, "clips"))):
     whole = float(np.mean([x.mean() for x in fr]))
     use_top = top <= low * 1.15
     area = top if use_top else low
-    e = {"y0": 330 if use_top else 1180,
+    e = {"y0": 330 if use_top else 1160, "top": use_top,
          "blob": round(min(0.6, max(0.3, 0.3 + area / 200)), 2),
          "pre": "eq=gamma=0.72:brightness=-0.06," if whole > 70 else "",
-         "len": round(d, 2), "tags": [], "last_used": ""}
+         "len": round(d, 2), "tags": ["new"], "last_used": ""}
     data[f] = e
     print(f, e, f"top={top:.0f} low={low:.0f} whole={whole:.0f}")
 

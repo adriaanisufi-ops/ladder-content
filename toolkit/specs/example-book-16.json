@@ -1,0 +1,37 @@
+{
+  "name": "ladder-reel-16",
+  "clip": "clips/ladder-stad-11240584.mp4",
+  "mode": "book",
+  "y0": 260,
+  "blob": 0.4,
+  "minlen": 4,
+  "blocks": [
+    [
+      [
+        "Discipline that needs an audience"
+      ],
+      [
+        "isn't discipline.",
+        "gold"
+      ]
+    ],
+    [
+      [
+        "It's performance"
+      ],
+      [
+        "wearing discipline's clothes.",
+        "gold"
+      ]
+    ],
+    [
+      [
+        "How you do one thing"
+      ],
+      [
+        "is how you do everything.",
+        "gold"
+      ]
+    ]
+  ]
+}

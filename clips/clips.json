@@ -1,182 +1,113 @@
 {
- "snelweg.mp4": {
-  "blob": 0.34,
-  "last_used": "",
-  "len": 23.33,
-  "pre": "",
-  "tags": [
-   "cars"
-  ],
-  "y0": 330
- },
- "src-03.mp4": {
-  "blob": 0.3,
-  "last_used": "",
-  "len": 19.97,
-  "pre": "",
-  "tags": [
-   "cars"
-  ],
-  "y0": 330
- },
- "src-03c.mp4": {
-  "blob": 0.47,
-  "last_used": "",
-  "len": 25.0,
-  "pre": "",
-  "tags": [
-   "cars"
-  ],
-  "y0": 330
- },
- "src-04.mp4": {
-  "blob": 0.41,
-  "last_used": "",
-  "len": 9.17,
-  "pre": "",
-  "tags": [
-   "night"
-  ],
-  "y0": 330
- },
- "src-04b.mp4": {
-  "blob": 0.38,
-  "last_used": "",
-  "len": 15.03,
-  "pre": "",
-  "tags": [
-   "night"
-  ],
-  "y0": 1180
- },
- "src-05.mp4": {
-  "blob": 0.54,
-  "last_used": "",
-  "len": 19.37,
-  "pre": "",
-  "tags": [
-   "night"
-  ],
-  "y0": 1180
- },
- "src-06.mp4": {
-  "blob": 0.3,
-  "last_used": "",
-  "len": 15.0,
-  "pre": "eq=gamma=0.72:brightness=-0.06,",
-  "tags": [
-   "night"
-  ],
-  "y0": 1180
- },
- "src-07.mp4": {
-  "blob": 0.51,
-  "last_used": "",
-  "len": 15.0,
-  "pre": "",
-  "tags": [
-   "night"
-  ],
-  "y0": 330
- },
- "src-08.mp4": {
-  "blob": 0.36,
-  "last_used": "",
-  "len": 15.0,
-  "pre": "",
-  "tags": [
-   "night"
-  ],
-  "y0": 330
- },
- "src-09.mp4": {
-  "blob": 0.3,
-  "last_used": "",
-  "len": 14.17,
-  "pre": "",
-  "tags": [
-   "cars"
-  ],
-  "y0": 330
- },
- "src-10.mp4": {
+ "ladder-snelweg-36601677-4k.mp4": {
   "blob": 0.45,
   "last_used": "",
-  "len": 15.0,
   "pre": "",
   "tags": [
-   "night"
+   "cars"
   ],
-  "y0": 330
+  "top": true,
+  "y0": 560
  },
- "src-11.mp4": {
+ "ladder-src-03c.mp4": {
   "blob": 0.35,
   "last_used": "",
-  "len": 25.0,
   "pre": "",
   "tags": [
-   "cars"
+   "city"
   ],
-  "y0": 330
+  "top": true,
+  "y0": 380
  },
- "src-12.mp4": {
-  "blob": 0.3,
-  "last_used": "",
-  "len": 24.57,
-  "pre": "",
-  "tags": [
-   "cars"
-  ],
-  "y0": 330
- },
- "src-13.mp4": {
+ "ladder-src-07.mp4": {
   "blob": 0.45,
   "last_used": "",
-  "len": 18.7,
+  "pre": "",
+  "tags": [
+   "nature"
+  ],
+  "top": true,
+  "y0": 560
+ },
+ "ladder-src-10.mp4": {
+  "blob": 0.45,
+  "last_used": "",
+  "pre": "",
+  "tags": [
+   "nature"
+  ],
+  "top": true,
+  "y0": 560
+ },
+ "ladder-src-11.mp4": {
+  "blob": 0.45,
+  "last_used": "",
   "pre": "",
   "tags": [
    "cars"
   ],
+  "top": false,
+  "y0": 1160
+ },
+ "ladder-src-12.mp4": {
+  "blob": 0.3,
+  "last_used": "",
+  "pre": "",
+  "tags": [
+   "cars"
+  ],
+  "top": true,
+  "y0": 330
+ },
+ "ladder-src-13.mp4": {
+  "blob": 0.45,
+  "last_used": "",
+  "pre": "",
+  "tags": [
+   "cars"
+  ],
+  "top": true,
   "y0": 300
  },
- "src-14.mp4": {
+ "ladder-src-14.mp4": {
   "blob": 0.3,
   "last_used": "",
-  "len": 20.67,
   "pre": "",
   "tags": [
    "cars"
   ],
+  "top": false,
   "y0": 1180
  },
- "src-15.mp4": {
+ "ladder-src-15.mp4": {
   "blob": 0.45,
   "last_used": "",
-  "len": 25.0,
   "pre": "",
   "tags": [
    "cars"
   ],
+  "top": true,
   "y0": 330
  },
- "stad-11240584.mp4": {
+ "ladder-stad-11240584.mp4": {
   "blob": 0.4,
   "last_used": "",
-  "len": 25.0,
   "pre": "",
   "tags": [
-   "cars"
+   "city",
+   "book"
   ],
+  "top": true,
   "y0": 260
  },
- "stad-19735541.mp4": {
-  "blob": 0.41,
+ "ladder-stad-19735541.mp4": {
+  "blob": 0.45,
   "last_used": "",
-  "len": 21.07,
   "pre": "",
   "tags": [
    "cars"
   ],
-  "y0": 330
+  "top": true,
+  "y0": 560
  }
 }

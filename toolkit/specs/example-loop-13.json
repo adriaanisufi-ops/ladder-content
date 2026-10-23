@@ -1,0 +1,40 @@
+{
+  "name": "ladder-reel-13",
+  "clip": "clips/ladder-src-13.mp4",
+  "mode": "loop",
+  "y0": 300,
+  "blob": 0.45,
+  "minlen": 4,
+  "blocks": [
+    [
+      [
+        "Everyone wants the result."
+      ],
+      [
+        "Almost no one wants the price.",
+        "gold"
+      ]
+    ],
+    [
+      [
+        "You priced the destination"
+      ],
+      [
+        "but never the road.",
+        "gold"
+      ]
+    ],
+    [
+      [
+        "The ones that hurt to pay for"
+      ],
+      [
+        "are the only ones"
+      ],
+      [
+        "that change your life.",
+        "gold"
+      ]
+    ]
+  ]
+}
