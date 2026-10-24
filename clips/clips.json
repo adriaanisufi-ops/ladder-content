@@ -1,12 +1,12 @@
 {
  "ladder-snelweg-36601677-4k.mp4": {
   "blob": 0.45,
-  "last_used": "",
-  "pre": "",
+  "last_used": "2026-10-25",
+  "pre": "eq=gamma=1.2:brightness=0.03,",
   "tags": [
    "cars"
   ],
-  "top": true,
+  "top": false,
   "y0": 560
  },
  "ladder-src-03c.mp4": {
@@ -41,7 +41,7 @@
  },
  "ladder-src-11.mp4": {
   "blob": 0.45,
-  "last_used": "",
+  "last_used": "2026-10-25",
   "pre": "",
   "tags": [
    "cars"
@@ -101,9 +101,9 @@
   "y0": 260
  },
  "ladder-stad-19735541.mp4": {
-  "blob": 0.45,
-  "last_used": "",
-  "pre": "",
+  "blob": 0.6,
+  "last_used": "2026-10-25",
+  "pre": "eq=gamma=0.75:brightness=-0.05,",
   "tags": [
    "cars"
   ],
@@ -178,10 +178,10 @@
   "y0": 330
  },
  "pex-11372905.mp4": {
-  "blob": 0.37,
-  "last_used": "",
+  "blob": 0.6,
+  "last_used": "2026-10-25",
   "len": 20.0,
-  "pre": "",
+  "pre": "eq=gamma=0.8:brightness=-0.03,",
   "tags": [
    "cars"
   ],
