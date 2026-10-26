@@ -88,6 +88,7 @@ def upload(path, at):
     hdr = {"Authorization": f"Bearer {at}", "Content-Type": "application/json; charset=UTF-8"}
     st, j = req("POST", f"{API}/v2/post/publish/inbox/video/init/",
                 {"source_info": {"source": "FILE_UPLOAD", "video_size": size, "chunk_size": size, "total_chunk_count": 1}}, hdr)
+    print(f"init {st}: {json.dumps(j.get('error'))}", flush=True)
     if j.get("error", {}).get("code") not in (None, "ok"):
         raise RuntimeError(f"init {st}: {j['error']}")
     d = j["data"]
@@ -103,9 +104,10 @@ def upload(path, at):
         s = j3.get("data", {}).get("status")
         if s in ("SEND_TO_USER_INBOX", "PUBLISH_COMPLETE"):
             return s
+        print(f"status {s}", flush=True)
         if s == "FAILED":
             raise RuntimeError(f"failed: {j3['data'].get('fail_reason')}")
-    return s or "UNKNOWN"
+    return f"still {s} after 150 s (last response: {json.dumps(j3)[:300]})"
 
 
 if __name__ == "__main__":
@@ -117,9 +119,10 @@ if __name__ == "__main__":
         bad = 0
         for p in args:
             try:
-                print(os.path.basename(p), upload(p, at), flush=True)
+                st = upload(p, at)
+                print(f"::notice::{os.path.basename(p)}: {st}", flush=True)
             except Exception as e:
                 bad += 1
-                print(os.path.basename(p), "ERROR", e, flush=True)
+                print(f"::error::{os.path.basename(p)}: {e}", flush=True)
             time.sleep(3)
         sys.exit(1 if bad else 0)
