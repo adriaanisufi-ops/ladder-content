@@ -1,0 +1,39 @@
+name: TikTok inbox upload
+# Runs when a new batch lands on the media branch (pushed by toolkit/publish_media.sh),
+# or by hand from the Actions tab.
+on:
+  push:
+    branches: [media]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: media
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+      - uses: actions/checkout@v4
+        with:
+          ref: tiktok-state
+          path: state
+      - name: Upload to TikTok inbox
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          STATE_DIR: state
+        run: |
+          DAY=$(ls -d 20*/ | sort | tail -1)
+          python3 main/toolkit/tiktok_inbox.py upload $(ls "$DAY"*.mp4 | sort)
+      - name: Save rotated token
+        if: always()
+        run: |
+          cd state
+          git add token.enc
+          git -c user.name="ladder-bot" -c user.email="ladder-bot@users.noreply.github.com" commit -q -m "token" || exit 0
+          git push -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" HEAD:tiktok-state

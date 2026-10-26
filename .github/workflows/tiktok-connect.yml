@@ -1,0 +1,28 @@
+name: TikTok connect (one time)
+on:
+  workflow_dispatch:
+    inputs:
+      code:
+        description: "Code from the callback page"
+        required: true
+permissions:
+  contents: write
+jobs:
+  connect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exchange code for tokens
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          STATE_DIR: state
+          CODE: ${{ github.event.inputs.code }}
+        run: python3 toolkit/tiktok_inbox.py connect "$CODE"
+      - name: Save encrypted token on tiktok-state branch
+        run: |
+          cd state
+          git init -q && git checkout -q -b tiktok-state
+          git add token.enc
+          git -c user.name="ladder-bot" -c user.email="ladder-bot@users.noreply.github.com" commit -q -m "token"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" tiktok-state

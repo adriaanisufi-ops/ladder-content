@@ -6,14 +6,18 @@
 # storage when the post is scheduled, so older files aren't needed after scheduling.
 set -euo pipefail
 SRC=$(cd "$1" && pwd)
+HERE=$(cd "$(dirname "$0")" && pwd)
 DAY=$(basename "$SRC")
 REPO=adriaanisufi-ops/ladder-content
 TMP=$(mktemp -d)
 cd "$TMP"
 git init -q
 git checkout -q --orphan media
-mkdir -p "$DAY"
+mkdir -p "$DAY" .github/workflows
 cp "$SRC"/*.mp4 "$DAY"/
+# GitHub runs a push workflow from the pushed branch itself, so the media branch
+# carries the TikTok inbox workflow too; this push triggers the upload.
+cp "$HERE/../.github/workflows/tiktok-inbox.yml" .github/workflows/
 git add -A
 git -c user.name="Claude" -c user.email="noreply@anthropic.com" commit -q -m "media $DAY"
 git remote add origin "https://github.com/$REPO"
