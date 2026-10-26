@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ladder Uploader, connected</title><link rel="stylesheet" href="style.css"></head><body><main>
+<h1>TikTok koppeling</h1>
+<p id="msg">Bezig...</p>
+<code id="code"></code>
+<script>
+var q=new URLSearchParams(location.search), c=q.get('code'), e=q.get('error_description')||q.get('error');
+var m=document.getElementById('msg'), b=document.getElementById('code');
+if(c){m.textContent='Gelukt. Kopieer deze code en plak hem in de chat met Claude. Hij is maar een paar minuten geldig.';b.textContent=c;}
+else if(e){m.textContent='TikTok gaf een fout: '+e;b.style.display='none';}
+else{m.textContent='Deze pagina wordt gebruikt om je TikTok account te koppelen. Er staat nu geen code in de link.';b.style.display='none';}
+</script>
+</main></body></html>
