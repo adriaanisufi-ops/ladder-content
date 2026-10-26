@@ -1,11 +1,19 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ladder Uploader, connected</title><link rel="stylesheet" href="style.css"></head><body><main>
 <h1>TikTok koppeling</h1>
 <p id="msg">Bezig...</p>
+<p><button id="copy" style="display:none;background:#f5c542;color:#0b0b0b;border:0;padding:12px 20px;border-radius:6px;font-weight:600;font-size:16px;cursor:pointer">1. Kopieer code</button></p>
+<p><a id="gh" target="_blank" style="display:none;background:#2ea043;color:#fff;padding:12px 20px;border-radius:6px;font-weight:600;text-decoration:none" href="https://github.com/adriaanisufi-ops/ladder-content/actions/workflows/tiktok-connect.yml">2. Open GitHub en klik Run workflow</a></p>
 <code id="code"></code>
+<p><small id="t"></small></p>
 <script>
 var q=new URLSearchParams(location.search), c=q.get('code'), e=q.get('error_description')||q.get('error');
-var m=document.getElementById('msg'), b=document.getElementById('code');
-if(c){m.textContent='Gelukt. Kopieer deze code en plak hem in de chat met Claude. Hij is maar een paar minuten geldig.';b.textContent=c;}
+var m=document.getElementById('msg'), b=document.getElementById('code'), cp=document.getElementById('copy'), gh=document.getElementById('gh');
+if(c){
+ m.textContent='Gelukt. Snel nu: de code werkt maar kort en maar één keer.';
+ b.textContent=c; cp.style.display='inline-block'; gh.style.display='inline-block';
+ cp.onclick=function(){navigator.clipboard.writeText(c).then(function(){cp.textContent='Gekopieerd ✓';});};
+ var s=0; setInterval(function(){s++;document.getElementById('t').textContent='Code opgehaald '+s+' seconden geleden';},1000);
+}
 else if(e){m.textContent='TikTok gaf een fout: '+e;b.style.display='none';}
 else{m.textContent='Deze pagina wordt gebruikt om je TikTok account te koppelen. Er staat nu geen code in de link.';b.style.display='none';}
 </script>
