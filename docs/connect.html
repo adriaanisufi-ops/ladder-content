@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ladder Uploader, connect</title><link rel="stylesheet" href="style.css"></head><body><main>
+<h1>Koppel je TikTok</h1>
+<p>Klik op de knop, log in met @theladderrr en geef toestemming. Je komt daarna terug op een pagina met een code.</p>
+<p><a id="go" style="display:inline-block;background:#f5c542;color:#0b0b0b;padding:12px 20px;border-radius:6px;font-weight:600;text-decoration:none" href="#">Koppel TikTok</a></p>
+<script>
+var p=new URLSearchParams({client_key:'sbawr01gpej0cn0189',scope:'user.info.basic,video.upload',response_type:'code',
+ redirect_uri:'https://adriaanisufi-ops.github.io/ladder-content/callback.html',state:Math.random().toString(36).slice(2)});
+document.getElementById('go').href='https://www.tiktok.com/v2/auth/authorize/?'+p.toString();
+</script>
+</main></body></html>
