@@ -9,10 +9,20 @@ The refresh token is stored encrypted (AES via openssl, passphrase = client secr
 STATE_DIR/token.enc; the workflow commits it to the `tiktok-state` branch after every run,
 because TikTok may rotate the refresh token.
 """
-import json, os, subprocess, sys, time, urllib.parse, urllib.request
+import json, os, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
 
-KEY = os.environ["TIKTOK_CLIENT_KEY"]
-SECRET = os.environ["TIKTOK_CLIENT_SECRET"]
+def fail(msg):
+    # ::error:: makes the message show up in the run's Annotations box
+    print(f"::error::{msg}", flush=True)
+    sys.exit(1)
+
+
+KEY = os.environ.get("TIKTOK_CLIENT_KEY", "").strip()
+SECRET = os.environ.get("TIKTOK_CLIENT_SECRET", "").strip()
+if not KEY:
+    fail("Secret TIKTOK_CLIENT_KEY ontbreekt of is leeg (Settings > Secrets and variables > Actions)")
+if not SECRET:
+    fail("Secret TIKTOK_CLIENT_SECRET ontbreekt of is leeg (Settings > Secrets and variables > Actions)")
 STATE = os.path.join(os.environ.get("STATE_DIR", "state"), "token.enc")
 REDIRECT = "https://adriaanisufi-ops.github.io/ladder-content/callback.html"
 API = "https://open.tiktokapis.com"
@@ -55,7 +65,7 @@ def load():
 def token_call(extra):
     st, j = req("POST", f"{API}/v2/oauth/token/", dict(client_key=KEY, client_secret=SECRET, **extra))
     if "access_token" not in j:
-        sys.exit(f"token error {st}: {j.get('error')} {j.get('error_description')}")
+        fail(f"TikTok weigerde de code ({st}): {j.get('error')} {j.get('error_description')}")
     return {k: j[k] for k in ("access_token", "refresh_token", "open_id", "scope") if k in j}
 
 
