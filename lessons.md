@@ -1,16 +1,12 @@
 # Lessons (keep adding, newest at the top)
 
-## CTA test, 2026-10-28 to 2026-11-03 (coach session 2026-10-27)
-- Status 27 Oct: book is live on Payhip. Best TikTok 2000 views, 1 comment (0.05%). No sales yet.
-- Every video ends with a clear action ON SCREEN (spec field "cta", held 3 s), the same action in the caption.
-- Three closings, rotate them: closing for a video = (days since 2026-10-28 + video number) mod 3 (0=A, 1=B, 2=C).
-  - A "Comment BOOK and I'll send you the link."  on screen: ["Comment BOOK", "and I'll send you the link."]
-  - B "Which line do you recognize? Tell me in the comments."  on screen: ["Which line hits home?", "Tell me in the comments."]
-  - C "The book is linked in my bio."  on screen: ["Link in bio.", "The book behind these words."]
+## Phase 1: followers first (Adriaan, 2026-10-27, replaces the CTA test)
+- Goal now is followers and rewatches, conversion comes later. NO action on screen: no "Comment BOOK", no "link in bio", no "cta" field.
+- Default is a pure seamless loop in the style of ladder-reel-02 ("Time doesn't actually speed up."): 4 or 5 blocks, about 18 to 20 s, the last block restates the point so it flows straight back into the first line.
+- The 3D book outro only now and then: one book video every other day at most, the rest loops.
 - The hook is on screen from the first frame and is a claim or a pain, never the book or Adriaan's name.
-- Same video goes on TikTok, Instagram Reels and YouTube Shorts.
-- Track per video and platform in results.csv: views, comments, link clicks. On 2026-11-04 pick the winning closing.
-- Test video 2026-10-27-test.mp4 (closing A) was the first one.
+- Caption can still end with "Comment BOOK and I'll send it to you." (it is not in the video).
+- The CTA test (closings A/B/C, 27 Oct) is stopped. reel.py keeps the optional "cta" field for later.
 
 ## Our own results (as of 2026-10-23)
 - Videos with cars at night perform best for us (01 highway, 02 city traffic, 11 night drive).
