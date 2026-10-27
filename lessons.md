@@ -1,5 +1,9 @@
 # Lessons (keep adding, newest at the top)
 
+## Text style Adriaan likes (2026-10-27)
+- Liked: "Feeling motivated today? / Do less." Disliked the abstract ones ("bait and switch", "you're the sky", "preloading the state", "a tag you never read").
+- So: talk straight to "you", a question or a command, short plain words, punch lines of 2 to 5 words, advice that goes against what people expect. Concrete images (bubbles pop), no literary metaphors that need a second read.
+
 ## Phase 1: followers first (Adriaan, 2026-10-27, replaces the CTA test)
 - Goal now is followers and rewatches, conversion comes later. NO action on screen: no "Comment BOOK", no "link in bio", no "cta" field.
 - Default is a pure seamless loop in the style of ladder-reel-02 ("Time doesn't actually speed up."): 4 or 5 blocks, about 18 to 20 s, the last block restates the point so it flows straight back into the first line.
