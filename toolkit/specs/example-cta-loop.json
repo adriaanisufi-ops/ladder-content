@@ -1,0 +1,19 @@
+{
+ "name": "example-cta-loop",
+ "clip": "clips/pex-11372919.mp4",
+ "mode": "loop",
+ "y0": 330,
+ "top": true,
+ "blob": 0.35,
+ "pre": "",
+ "minlen": 4,
+ "len": 20.0,
+ "blocks": [
+  [["Motivation will leave you."], ["That's the day that counts.", "gold"]],
+  [["Not the good days."], ["The one where skipping"], ["would be easiest.", "gold"]],
+  [["The smallest version, kept anyway,"], ["beats a week of big effort.", "gold"]],
+  [["Quiet work. Rung by rung."], ["Long after anyone is watching.", "gold"]]
+ ],
+ "cta": ["Comment BOOK", "and I'll send you the link."],
+ "cta_len": 3
+}

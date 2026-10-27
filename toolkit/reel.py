@@ -16,8 +16,11 @@ Spec (JSON):
   "blocks": [
     [["Everyone wants the result."], ["Almost no one wants the price.", "gold"]],
     [["You priced the destination"], ["but never the road.", "gold"]]
-  ]
+  ],
+  "cta": ["Comment BOOK", "and I'll send you the link."],   # optional: closing action on screen,
+  "cta_len": 3                                              # held this many seconds after the text
 }
+With "cta" in mode book, the outro shows these lines instead of the default "Comment BOOK" text.
 Each block is one screen of text. The line marked "gold" is the punch line: it lands one beat later,
 in yellow, and the lines above it dim. The last block holds until the loop restarts.
 """
@@ -40,6 +43,7 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
 Style: Body,Inter Medium,48,&H00E1E6E8,&H00E1E6E8,&H00000000,&H50000000,0,0,0,0,100,100,0.4,0,1,0,3,7,96,96,0,1
 Style: Gold,Inter SemiBold,48,&H0042C5F5,&H0042C5F5,&H00000000,&H50000000,0,0,0,0,100,100,0.4,0,1,0,3,7,96,96,0,1
 Style: CGold,Inter SemiBold,56,&H0042C5F5,&H0042C5F5,&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,0,0,8,60,60,0,1
+Style: LGold,Inter SemiBold,64,&H0042C5F5,&H0042C5F5,&H00000000,&H50000000,0,0,0,0,100,100,0.6,0,1,0,3,7,96,96,0,1
 Style: CBody,Inter Medium,36,&H00A0A4A6,&H00A0A4A6,&H00000000,&H00000000,0,0,0,0,100,100,0.5,0,1,0,0,8,60,60,0,1
 
 [Events]
@@ -50,7 +54,7 @@ def ts(s):
     m, sec = divmod(s, 60)
     return f"0:{int(m):02d}:{sec:05.2f}"
 
-def script(blocks, y0=560, minlen=5):
+def script(blocks, y0=560, minlen=5, cta=False):
     ev, t, plans = [], 0.0, []
     for bi, blk in enumerate(blocks):
         times, beat = [], 0
@@ -71,7 +75,7 @@ def script(blocks, y0=560, minlen=5):
                 y += 92 if gold else 62
             s, e = t + bt, t + length
             fin = 0 if (bi == 0 and i == 0) else 250
-            fout = 0 if last else 300
+            fout = 0 if (last and not cta) else 300
             tags = f"\\pos(96,{y})\\fad({fin},{fout})"
             if not gold:
                 a = int((t + gold_t - s) * 1000)
@@ -99,12 +103,20 @@ def build(spec_path):
     mode = v.get("mode", "loop")
     y0, minlen = v.get("y0", 560), v.get("minlen", 5)
     GRADE = grade(v.get("pre", ""), v.get("blob", 0.55), y0 + 130, v.get("top", True))
-    ev, T = script(v["blocks"], y0, minlen)
+    cta = v.get("cta")
+    ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book")
+    if cta and mode != "book":
+        cl = v.get("cta_len", 3)
+        ev.append((T, T + cl, "LGold", f"\\pos(96,{y0})\\fad(250,0)", cta[0]))
+        for k, ln in enumerate(cta[1:]):
+            ev.append((T + 0.5, T + cl, "Body", f"\\pos(96,{y0 + 100 + 62 * k})\\fad(250,0)", ln))
+        T += cl
     total = T + (OUTRO if mode == "book" else 0)
     if mode == "book":
+        c1, c2 = (cta[0], " ".join(cta[1:])) if cta else ("Comment BOOK", "and I'll send it to you.")
         ev += [(T + 1, total, "CBody", "\\pos(540,250)\\fad(500,0)", "The book behind these words."),
-               (T + 3, total, "CGold", "\\pos(540,1390)\\fad(300,0)", "Comment BOOK"),
-               (T + 4, total, "CBody", "\\pos(540,1466)\\fad(300,0)", "and I'll send it to you.")]
+               (T + 3, total, "CGold", "\\pos(540,1390)\\fad(300,0)", c1),
+               (T + 4, total, "CBody", "\\pos(540,1466)\\fad(300,0)", c2)]
     os.makedirs(os.path.join(LC, "out"), exist_ok=True)
     ass = os.path.join(LC, "out", f"{name}.ass")
     lines = [f"Dialogue: 0,{ts(s)},{ts(e)},{st},,0,0,0,,{{{tg}}}{tx}" for s, e, st, tg, tx in ev]
