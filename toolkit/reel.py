@@ -21,6 +21,7 @@ Spec (JSON):
   "cta_len": 3                                              # held this many seconds after the text
 }
 With "cta" in mode book, the outro shows these lines instead of the default "Comment BOOK" text.
+"outro_cta": false in mode book keeps only "The book behind these words." in the outro (Phase 1, no action on screen).
 Each block is one screen of text. The line marked "gold" is the punch line: it lands one beat later,
 in yellow, and the lines above it dim. The last block holds until the loop restarts.
 """
@@ -114,9 +115,10 @@ def build(spec_path):
     total = T + (OUTRO if mode == "book" else 0)
     if mode == "book":
         c1, c2 = (cta[0], " ".join(cta[1:])) if cta else ("Comment BOOK", "and I'll send it to you.")
-        ev += [(T + 1, total, "CBody", "\\pos(540,250)\\fad(500,0)", "The book behind these words."),
-               (T + 3, total, "CGold", "\\pos(540,1390)\\fad(300,0)", c1),
-               (T + 4, total, "CBody", "\\pos(540,1466)\\fad(300,0)", c2)]
+        ev += [(T + 1, total, "CBody", "\\pos(540,250)\\fad(500,0)", "The book behind these words.")]
+        if v.get("outro_cta", True):   # Phase 1: set "outro_cta": false for no action text in the outro
+            ev += [(T + 3, total, "CGold", "\\pos(540,1390)\\fad(300,0)", c1),
+                   (T + 4, total, "CBody", "\\pos(540,1466)\\fad(300,0)", c2)]
     os.makedirs(os.path.join(LC, "out"), exist_ok=True)
     ass = os.path.join(LC, "out", f"{name}.ass")
     lines = [f"Dialogue: 0,{ts(s)},{ts(e)},{st},,0,0,0,,{{{tg}}}{tx}" for s, e, st, tg, tx in ev]
