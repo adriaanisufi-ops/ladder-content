@@ -1,5 +1,12 @@
 # Lessons (keep adding, newest at the top)
 
+## Winners so far (Adriaan, 2026-11-07)
+- "You didn't choose that thought." (3 Nov, pex-19452742, aerial highway, text top): 82 likes, 4 saves after 3 days. Caption: "Half the thoughts you obey today aren't even yours."
+- "Your plan is built for who you wish you were." (29 Oct, ladder-src-14, dark tunnel drive, text bottom): also did well.
+- Shared pattern: a short "you/your" accusation about the person's own mind or self image (2 lines, punch of 3 to 5 words), the hook complete within 2 seconds, very dark calm footage with lots of empty space around the text.
+- Do more of this: hooks that tell the viewer something about themselves they didn't notice ("You didn't choose...", "Your X is built for...", "That's not yours."). Remake these two with new footage and a follow up angle.
+- Sound is added by hand in TikTok: slow, calm, emotional (piano, ambient, slow guitar), ideally around 60 or 120 BPM so the text lands on the beat.
+
 ## Text style Adriaan likes (2026-10-27)
 - Liked: "Feeling motivated today? / Do less." Disliked the abstract ones ("bait and switch", "you're the sky", "preloading the state", "a tag you never read").
 - So: talk straight to "you", a question or a command, short plain words, punch lines of 2 to 5 words, advice that goes against what people expect. Concrete images (bubbles pop), no literary metaphors that need a second read.
