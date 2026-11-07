@@ -7,6 +7,7 @@
 - "Nobody is coming to rebuild you." (4 Nov, pex-40074031, near black aerial street, text bottom): 54 likes, 9 saves, best save rate so far. Sound: "Mamnoun" by Ehab (slow, emotional). Caption: "Your past explains you. It doesn't excuse you."
 - Shared pattern: a short "you/your" accusation about the person's own mind or self image (2 lines, punch of 3 to 5 words), the hook complete within 2 seconds, very dark calm footage with lots of empty space around the text.
 - Do more of this: hooks that tell the viewer something about themselves they didn't notice ("You didn't choose...", "Your X is built for...", "That's not yours."). Remake these two with new footage and a follow up angle.
+- Adriaan 2026-11-07: focus more on this winning style. Default now: hard truth "you" hooks, near black footage in black and white ("pre": "hue=s=0,..." before the grade).
 - Sound is added by hand in TikTok: "Mamnoun" (Ehab) worked on a winner; slow, calm, emotional (piano, ambient, slow guitar), ideally around 60 or 120 BPM so the text lands on the beat.
 
 ## Text style Adriaan likes (2026-10-27)
