@@ -1,8 +1,9 @@
 # Lessons (keep adding, newest at the top)
 
-## Test format "Hard truth" (2026-11-08, waiting for results)
-- First test video 2026-11-08-hardtruth-1: 13.5 s instead of 18 to 20, beat 0.75 (80 BPM), hook line bigger (hook_size 76), text size 64, small series label "HARD TRUTH #1" above the text, driving clip with motion from the first frame, comment bait in the hook instead of a CTA, pinned comment with a question.
-- New reel.py spec fields: "beat", "hook_size", "label" (plus "size" and "x"). Number the label on from #1 when this format is used again.
+## Test format: short, fast, big hook (2026-11-08, waiting for results)
+- First test video 2026-11-08-extra-1: 13.5 s instead of 18 to 20, beat 0.75 (80 BPM), hook line bigger (hook_size 76), text size 64, driving clip with motion from the first frame, comment bait in the hook instead of a CTA, pinned comment with a question.
+- Adriaan 2026-11-08: liked this format, but NO series label ("HARD TRUTH #1") on screen. Never use the "label" field.
+- New reel.py spec fields: "beat", "hook_size" (plus "size" and "x").
 - Compare its average watch time and full watch rate with the 18 s loops before making it the default.
 
 ## Text position: middle of the screen (Adriaan, 2026-11-08, binding)
