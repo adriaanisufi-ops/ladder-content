@@ -13,6 +13,8 @@ Spec (JSON):
   "blob": 0.45,                           # strength of the soft dark patch behind the text
   "pre": "",                              # optional extra ffmpeg filter, e.g. "eq=gamma=0.75,"
   "minlen": 4,                            # minimum beats per block
+  "size": 48,                             # optional: font size of the text lines (64 = big; keep lines short)
+  "x": 96,                                # optional: left margin of the text
   "blocks": [
     [["Everyone wants the result."], ["Almost no one wants the price.", "gold"]],
     [["You priced the destination"], ["but never the road.", "gold"]]
@@ -55,7 +57,8 @@ def ts(s):
     m, sec = divmod(s, 60)
     return f"0:{int(m):02d}:{sec:05.2f}"
 
-def script(blocks, y0=560, minlen=5, cta=False):
+def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96):
+    k = size / 48
     ev, t, plans = [], 0.0, []
     for bi, blk in enumerate(blocks):
         times, beat = [], 0
@@ -73,11 +76,13 @@ def script(blocks, y0=560, minlen=5, cta=False):
         for i, (ln, bt) in enumerate(zip(blk, times)):
             gold = len(ln) > 1
             if i > 0:
-                y += 92 if gold else 62
+                y += round((92 if gold else 62) * k)
             s, e = t + bt, t + length
             fin = 0 if (bi == 0 and i == 0) else 250
             fout = 0 if (last and not cta) else 300
-            tags = f"\\pos(96,{y})\\fad({fin},{fout})"
+            tags = f"\\pos({x},{y})\\fad({fin},{fout})"
+            if size != 48:
+                tags += f"\\fs{size}"
             if not gold:
                 a = int((t + gold_t - s) * 1000)
                 tags += f"\\t({a},{a+400},\\1a&H60&\\4a&HB0&)"
@@ -105,7 +110,7 @@ def build(spec_path):
     y0, minlen = v.get("y0", 560), v.get("minlen", 5)
     GRADE = grade(v.get("pre", ""), v.get("blob", 0.55), y0 + 130, v.get("top", True))
     cta = v.get("cta")
-    ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book")
+    ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book", v.get("size", 48), v.get("x", 96))
     if cta and mode != "book":
         cl = v.get("cta_len", 3)
         ev.append((T, T + cl, "LGold", f"\\pos(96,{y0})\\fad(250,0)", cta[0]))
