@@ -15,6 +15,9 @@ Spec (JSON):
   "minlen": 4,                            # minimum beats per block
   "size": 48,                             # optional: font size of the text lines (64 = big; keep lines short)
   "x": 96,                                # optional: left margin of the text
+  "beat": 1.0,                            # optional: seconds per beat (0.75 = 80 BPM, faster pace)
+  "hook_size": 76,                        # optional: bigger font for the very first line (the hook)
+  "label": "HARD TRUTH #1",               # optional: small series label above the text, whole video
   "blocks": [
     [["Everyone wants the result."], ["Almost no one wants the price.", "gold"]],
     [["You priced the destination"], ["but never the road.", "gold"]]
@@ -57,19 +60,19 @@ def ts(s):
     m, sec = divmod(s, 60)
     return f"0:{int(m):02d}:{sec:05.2f}"
 
-def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96):
+def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_size=None):
     k = size / 48
     ev, t, plans = [], 0.0, []
     for bi, blk in enumerate(blocks):
-        times, beat = [], 0
+        times, b = [], 0
         for ln in blk:
             if len(ln) > 1:
-                beat += 1
-            times.append(beat); beat += 1
+                b += 1
+            times.append(b); b += 1
         gold_t = times[-1]
         length = max(minlen, gold_t + 2) + (1 if bi == len(blocks) - 1 else 0)
         plans.append((blk, times, gold_t, length))
-    total = sum(p[3] for p in plans)
+    total = sum(p[3] for p in plans) * beat
     for bi, (blk, times, gold_t, length) in enumerate(plans):
         last = bi == len(plans) - 1
         y = y0
@@ -77,17 +80,21 @@ def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96):
             gold = len(ln) > 1
             if i > 0:
                 y += round((92 if gold else 62) * k)
-            s, e = t + bt, t + length
+                if bi == 0 and i == 1 and hook_size:
+                    y += hook_size - size
+            s, e = t + bt * beat, t + length * beat
             fin = 0 if (bi == 0 and i == 0) else 250
             fout = 0 if (last and not cta) else 300
             tags = f"\\pos({x},{y})\\fad({fin},{fout})"
-            if size != 48:
+            if bi == 0 and i == 0 and hook_size:
+                tags += f"\\fs{hook_size}"
+            elif size != 48:
                 tags += f"\\fs{size}"
             if not gold:
-                a = int((t + gold_t - s) * 1000)
+                a = int((t + gold_t * beat - s) * 1000)
                 tags += f"\\t({a},{a+400},\\1a&H60&\\4a&HB0&)"
             ev.append((s, e, "Gold" if gold else "Body", tags, ln[0]))
-        t += length
+        t += length * beat
     return ev, total
 
 def grade(pre="", blob=0.55, by=690, top=True):
@@ -110,7 +117,10 @@ def build(spec_path):
     y0, minlen = v.get("y0", 560), v.get("minlen", 5)
     GRADE = grade(v.get("pre", ""), v.get("blob", 0.55), y0 + 130, v.get("top", True))
     cta = v.get("cta")
-    ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book", v.get("size", 48), v.get("x", 96))
+    ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book", v.get("size", 48), v.get("x", 96),
+                   v.get("beat", 1.0), v.get("hook_size"))
+    if v.get("label"):   # small series label above the text, on screen the whole time
+        ev.insert(0, (0, T, "Body", f"\\pos({v.get('x', 96)},{y0 - 64})\\fs30\\fsp6\\1a&H70&\\4a&HB0&", v["label"]))
     if cta and mode != "book":
         cl = v.get("cta_len", 3)
         ev.append((T, T + cl, "LGold", f"\\pos(96,{y0})\\fad(250,0)", cta[0]))

@@ -1,5 +1,10 @@
 # Lessons (keep adding, newest at the top)
 
+## Test format "Hard truth" (2026-11-08, waiting for results)
+- First test video 2026-11-08-hardtruth-1: 13.5 s instead of 18 to 20, beat 0.75 (80 BPM), hook line bigger (hook_size 76), text size 64, small series label "HARD TRUTH #1" above the text, driving clip with motion from the first frame, comment bait in the hook instead of a CTA, pinned comment with a question.
+- New reel.py spec fields: "beat", "hook_size", "label" (plus "size" and "x"). Number the label on from #1 when this format is used again.
+- Compare its average watch time and full watch rate with the 18 s loops before making it the default.
+
 ## Text position: middle of the screen (Adriaan, 2026-11-08, binding)
 - On the phone, text at the top (y0 around 230 to 330) gets hidden behind TikTok's top bar, and text at the bottom (y0 1160) sits under the caption and buttons. Every line must be readable in the TikTok app.
 - Default now: y0 = 740 for every video (text block roughly y 740 to 950 on the 1920 frame). All clips in clips.json are set to 740. Never go above y0 650 or below y0 850.
