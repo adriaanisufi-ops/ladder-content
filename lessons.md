@@ -1,5 +1,11 @@
 # Lessons (keep adding, newest at the top)
 
+## Text position: middle of the screen (Adriaan, 2026-11-08, binding)
+- On the phone, text at the top (y0 around 230 to 330) gets hidden behind TikTok's top bar, and text at the bottom (y0 1160) sits under the caption and buttons. Every line must be readable in the TikTok app.
+- Default now: y0 = 740 for every video (text block roughly y 740 to 950 on the 1920 frame). All clips in clips.json are set to 740. Never go above y0 650 or below y0 850.
+- TikTok safe zone to check against (1080x1920): keep text out of the top 200 px, the bottom 480 px (from y 1440) and the right rail (x above 940, y 880 to 1640). Keep lines at or under about 34 characters so they don't reach the right rail.
+- When checking frames, draw these zones on the frames (ffmpeg drawbox) and confirm no text touches them. If the middle of the clip is busy with headlights, raise blob (up to 0.8) and add "eq=gamma=0.75:brightness=-0.05," to pre instead of moving the text up or down.
+
 ## Winners so far (Adriaan, 2026-11-07)
 - Third pattern element: hard truth that takes away an excuse or a hope of rescue ("Nobody is coming...") gets saved most.
 - "You didn't choose that thought." (3 Nov, pex-19452742, aerial highway, text top): 82 likes, 4 saves after 3 days. Caption: "Half the thoughts you obey today aren't even yours."
