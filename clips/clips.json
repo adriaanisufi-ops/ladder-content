@@ -4,7 +4,8 @@
   "last_used": "2026-11-08",
   "pre": "eq=gamma=1.2:brightness=0.03,",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": false,
   "y0": 740
@@ -74,7 +75,8 @@
   "last_used": "2026-10-29",
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": false,
   "y0": 740
@@ -128,7 +130,8 @@
   "len": 6.97,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": false,
   "y0": 740
@@ -271,7 +274,8 @@
   "len": 8.17,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": true,
   "y0": 740
@@ -315,7 +319,8 @@
   "len": 14.23,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": false,
   "y0": 740
@@ -326,7 +331,8 @@
   "len": 20.03,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": true,
   "y0": 740
@@ -370,7 +376,8 @@
   "len": 13.43,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": false,
   "y0": 740
@@ -381,7 +388,8 @@
   "len": 17.5,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": false,
   "y0": 740
@@ -425,7 +433,8 @@
   "len": 20.03,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": true,
   "y0": 740
@@ -602,7 +611,8 @@
   "len": 20.0,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": true,
   "y0": 740
@@ -701,7 +711,8 @@
   "len": 20.0,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": true,
   "y0": 740
@@ -723,7 +734,8 @@
   "len": 20.0,
   "pre": "",
   "tags": [
-   "cars"
+   "cars",
+   "driving"
   ],
   "top": false,
   "y0": 740

@@ -1,10 +1,15 @@
 # Lessons (keep adding, newest at the top)
 
-## Test format: short, fast, big hook (2026-11-08, waiting for results)
-- First test video 2026-11-08-extra-1: 13.5 s instead of 18 to 20, beat 0.75 (80 BPM), hook line bigger (hook_size 76), text size 64, driving clip with motion from the first frame, comment bait in the hook instead of a CTA, pinned comment with a question.
-- Adriaan 2026-11-08: liked this format, but NO series label ("HARD TRUTH #1") on screen. Never use the "label" field.
-- New reel.py spec fields: "beat", "hook_size" (plus "size" and "x").
-- Compare its average watch time and full watch rate with the 18 s loops before making it the default.
+## DEFAULT FORMAT from 2026-11-09 (Adriaan, binding, replaces the 18 to 20 s loops)
+Every video is made like 2026-11-08-extra-1 ("You're not unmotivated. / You're vague."; spec in out/ is not in git, so the values are here):
+- Spec values: "beat": 0.75 (80 BPM), "minlen": 4, "size": 64, "hook_size": 76, "x": 80, "y0": 720, "blob" about 0.45 (up to 0.8 on busy footage), black and white ("pre" starts with "hue=s=0,"). NEVER the "label" field (no series label like "HARD TRUTH #1" on screen) and never "cta".
+- Length about 13.5 s: 4 blocks; blocks 1, 2 and 4 have 2 lines, block 3 may have 3. The last block flows back into the hook so the loop is seamless.
+- Hook: the very first line, on screen from frame 1, max about 24 characters, a short "you/your" claim people want to react to ("You're not unmotivated."), with a 2 or 3 word gold answer ("You're vague.").
+- Line width at size 64: keep every line at most about 26 characters (measure with PIL and Inter: x + width must stay under 940 px, hook under 1000 px). Split long sentences over two lines.
+- Footage: clips tagged "driving" first (POV drives, dark roads, tunnels, mirrors: motion from the first frame, calm and dark), least recently used first. Fall back to dark calm car clips when no driving clip is free.
+- Caption: first line uses search words (discipline, motivation, goals, self improvement), then "Send this to someone who ...", then "Comment BOOK and I'll send it to you.", then 4 hashtags. Also give one short question per video for Adriaan to post and pin as the first comment.
+- Sound: tell him to pick a sound around 80 BPM so the text lands on the beat.
+- Still compare watch time and full watch rate with the old 18 s loops when Adriaan sends numbers.
 
 ## Text position: middle of the screen (Adriaan, 2026-11-08, binding)
 - On the phone, text at the top (y0 around 230 to 330) gets hidden behind TikTok's top bar, and text at the bottom (y0 1160) sits under the caption and buttons. Every line must be readable in the TikTok app.
@@ -28,7 +33,7 @@
 
 ## Phase 1: followers first (Adriaan, 2026-10-27, replaces the CTA test)
 - Goal now is followers and rewatches, conversion comes later. NO action on screen: no "Comment BOOK", no "link in bio", no "cta" field.
-- Default is a pure seamless loop in the style of ladder-reel-02 ("Time doesn't actually speed up."): 4 or 5 blocks, about 18 to 20 s, the last block restates the point so it flows straight back into the first line.
+- Default is a pure seamless loop: the last block restates the point so it flows straight back into the first line. Length, pace and text size: see DEFAULT FORMAT at the top (about 13.5 s since 2026-11-09).
 - The 3D book outro only now and then: one book video every other day at most, the rest loops.
 - The hook is on screen from the first frame and is a claim or a pain, never the book or Adriaan's name.
 - Caption can still end with "Comment BOOK and I'll send it to you." (it is not in the video).
