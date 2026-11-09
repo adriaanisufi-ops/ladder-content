@@ -9,6 +9,7 @@ Every video is made like 2026-11-08-extra-1 ("You're not unmotivated. / You're v
 - Footage: clips tagged "driving" first (POV drives, dark roads, tunnels, mirrors: motion from the first frame, calm and dark), least recently used first. Fall back to dark calm car clips when no driving clip is free.
 - Caption: first line uses search words (discipline, motivation, goals, self improvement), then "Send this to someone who ...", then "Comment BOOK and I'll send it to you.", then 4 hashtags. Also give one short question per video for Adriaan to post and pin as the first comment.
 - Sound: tell him to pick a sound around 80 BPM so the text lands on the beat.
+- More engagement (Adriaan 2026-11-09 wants more): put one concrete, recognisable list in the video ("The gym. The book. The call.") so people comment which one is theirs, and make the pinned comment a choice question about that list. No CTA on screen.
 - Still compare watch time and full watch rate with the old 18 s loops when Adriaan sends numbers.
 
 ## Text position: middle of the screen (Adriaan, 2026-11-08, binding)
