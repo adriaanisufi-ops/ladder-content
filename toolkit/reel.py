@@ -60,7 +60,7 @@ def ts(s):
     m, sec = divmod(s, 60)
     return f"0:{int(m):02d}:{sec:05.2f}"
 
-def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_size=None, dim="60"):
+def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_size=None, dim="60", gold_size=None, pop=False):
     k = size / 48
     ev, t, plans = [], 0.0, []
     for bi, blk in enumerate(blocks):
@@ -80,6 +80,8 @@ def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_si
             gold = len(ln) > 1
             if i > 0:
                 y += round((92 if gold else 62) * k)
+                if gold and gold_size:
+                    y += round((gold_size - size) * 0.5)
                 if bi == 0 and i == 1 and hook_size:
                     y += hook_size - size
             s, e = t + bt * beat, t + length * beat
@@ -88,8 +90,12 @@ def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_si
             tags = f"\\pos({x},{y})\\fad({fin},{fout})"
             if bi == 0 and i == 0 and hook_size:
                 tags += f"\\fs{hook_size}"
+            elif gold and gold_size:
+                tags += f"\\fs{gold_size}"
             elif size != 48:
                 tags += f"\\fs{size}"
+            if gold and pop:   # optional: punch line pops in slightly larger and settles
+                tags += "\\fscx118\\fscy118\\t(0,220,\\fscx100\\fscy100)"
             if not gold:
                 a = int((t + gold_t * beat - s) * 1000)
                 tags += f"\\t({a},{a+400},\\1a&H{dim}&\\4a&HB0&)"
@@ -118,7 +124,8 @@ def build(spec_path):
     GRADE = grade(v.get("pre", ""), v.get("blob", 0.55), y0 + 130, v.get("top", True))
     cta = v.get("cta")
     ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book", v.get("size", 48), v.get("x", 96),
-                   v.get("beat", 1.0), v.get("hook_size"), v.get("dim", "60"))
+                   v.get("beat", 1.0), v.get("hook_size"), v.get("dim", "60"),
+                   v.get("gold_size"), v.get("pop", False))
     if v.get("label"):   # small series label above the text, on screen the whole time
         ev.insert(0, (0, T, "Body", f"\\pos({v.get('x', 96)},{y0 - 64})\\fs30\\fsp6\\1a&H70&\\4a&HB0&", v["label"]))
     if cta and mode != "book":
