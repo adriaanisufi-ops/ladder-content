@@ -60,7 +60,7 @@ def ts(s):
     m, sec = divmod(s, 60)
     return f"0:{int(m):02d}:{sec:05.2f}"
 
-def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_size=None):
+def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_size=None, dim="60"):
     k = size / 48
     ev, t, plans = [], 0.0, []
     for bi, blk in enumerate(blocks):
@@ -92,7 +92,7 @@ def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_si
                 tags += f"\\fs{size}"
             if not gold:
                 a = int((t + gold_t * beat - s) * 1000)
-                tags += f"\\t({a},{a+400},\\1a&H60&\\4a&HB0&)"
+                tags += f"\\t({a},{a+400},\\1a&H{dim}&\\4a&HB0&)"
             ev.append((s, e, "Gold" if gold else "Body", tags, ln[0]))
         t += length * beat
     return ev, total
@@ -118,7 +118,7 @@ def build(spec_path):
     GRADE = grade(v.get("pre", ""), v.get("blob", 0.55), y0 + 130, v.get("top", True))
     cta = v.get("cta")
     ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book", v.get("size", 48), v.get("x", 96),
-                   v.get("beat", 1.0), v.get("hook_size"))
+                   v.get("beat", 1.0), v.get("hook_size"), v.get("dim", "60"))
     if v.get("label"):   # small series label above the text, on screen the whole time
         ev.insert(0, (0, T, "Body", f"\\pos({v.get('x', 96)},{y0 - 64})\\fs30\\fsp6\\1a&H70&\\4a&HB0&", v["label"]))
     if cta and mode != "book":
@@ -137,7 +137,15 @@ def build(spec_path):
     os.makedirs(os.path.join(LC, "out"), exist_ok=True)
     ass = os.path.join(LC, "out", f"{name}.ass")
     lines = [f"Dialogue: 0,{ts(s)},{ts(e)},{st},,0,0,0,,{{{tg}}}{tx}" for s, e, st, tg, tx in ev]
-    open(ass, "w").write(HEAD + "\n".join(lines) + "\n")
+    head = HEAD
+    if v.get("bold"):      # optional: SemiBold for the body lines too (crisper on a phone)
+        head = head.replace("Style: Body,Inter Medium", "Style: Body,Inter SemiBold")
+    if v.get("outline"):   # optional: thin dark outline around Body and Gold text, in px
+        o = v["outline"]
+        head = "\n".join(
+            (l.replace(",1,0,3,7,96,96,0,1", f",1,{o},3,7,96,96,0,1") if l.startswith(("Style: Body,", "Style: Gold,")) else l)
+            for l in head.split("\n"))
+    open(ass, "w").write(head + "\n".join(lines) + "\n")
 
     prep = "[0:v]scale=1080:1920:flags=lanczos,setsar=1"
     if mode == "pingpong":
