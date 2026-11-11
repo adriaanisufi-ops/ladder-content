@@ -17,6 +17,8 @@ Spec (JSON):
   "x": 96,                                # optional: left margin of the text
   "beat": 1.0,                            # optional: seconds per beat (0.75 = 80 BPM, faster pace)
   "hook_size": 76,                        # optional: bigger font for the very first line (the hook)
+  "ladder": true,                         # optional: signature ladder left of the text, one rung lights up per punch line
+  "climb": 50,                            # optional: every block sits this many px higher than the one before (text climbs)
   "label": "HARD TRUTH #1",               # optional: small series label above the text, whole video
   "blocks": [
     [["Everyone wants the result."], ["Almost no one wants the price.", "gold"]],
@@ -60,7 +62,7 @@ def ts(s):
     m, sec = divmod(s, 60)
     return f"0:{int(m):02d}:{sec:05.2f}"
 
-def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_size=None, dim="60", gold_size=None, pop=False):
+def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_size=None, dim="60", gold_size=None, pop=False, climb=0, golds=None):
     k = size / 48
     ev, t, plans = [], 0.0, []
     for bi, blk in enumerate(blocks):
@@ -75,7 +77,9 @@ def script(blocks, y0=560, minlen=5, cta=False, size=48, x=96, beat=1.0, hook_si
     total = sum(p[3] for p in plans) * beat
     for bi, (blk, times, gold_t, length) in enumerate(plans):
         last = bi == len(plans) - 1
-        y = y0
+        y = y0 - climb * bi
+        if golds is not None:
+            golds.append(t + gold_t * beat)
         for i, (ln, bt) in enumerate(zip(blk, times)):
             gold = len(ln) > 1
             if i > 0:
@@ -123,9 +127,27 @@ def build(spec_path):
     y0, minlen = v.get("y0", 560), v.get("minlen", 5)
     GRADE = grade(v.get("pre", ""), v.get("blob", 0.55), y0 + 130, v.get("top", True))
     cta = v.get("cta")
+    golds = []
     ev, T = script(v["blocks"], y0, minlen, bool(cta) and mode != "book", v.get("size", 48), v.get("x", 96),
                    v.get("beat", 1.0), v.get("hook_size"), v.get("dim", "60"),
-                   v.get("gold_size"), v.get("pop", False))
+                   v.get("gold_size"), v.get("pop", False), v.get("climb", 0), golds)
+    if v.get("ladder"):   # signature: a thin ladder left of the text, one rung lights up gold per punch line
+        lx, lw = v.get("x", 96) - 68, 34
+        n = len(golds)
+        gap = v.get("rung_gap", 80)
+        bot = y0 + 150
+        top_y = bot - gap * (n - 1)
+        box = lambda w, h: f"m 0 0 l {w} 0 {w} {h} 0 {h}"
+        base = "\\an7\\bord0\\shad0\\p1"
+        lad = []
+        for rx in (lx, lx + lw):
+            lad.append((0, T, "Body", f"\\pos({rx},{top_y - 46}){base}\\1c&HFFFFFF&\\1a&H90&", box(4, bot - top_y + 92)))
+        for k, gt in enumerate(golds):
+            ry = bot - gap * k
+            lad.append((0, T, "Body", f"\\pos({lx},{ry}){base}\\1c&HFFFFFF&\\1a&H90&", box(lw + 4, 5)))
+            lad.append((gt, T, "Body", f"\\pos({lx - 8},{ry - 8}){base}\\1c&H42C5F5&\\1a&H90&\\blur10\\fad(200,300)", box(lw + 20, 21)))
+            lad.append((gt, T, "Body", f"\\pos({lx},{ry}){base}\\1c&H42C5F5&\\fad(120,300)\\fscy400\\t(0,260,\\fscy100)", box(lw + 4, 5)))
+        ev = lad + ev
     if v.get("label"):   # small series label above the text, on screen the whole time
         ev.insert(0, (0, T, "Body", f"\\pos({v.get('x', 96)},{y0 - 64})\\fs30\\fsp6\\1a&H70&\\4a&HB0&", v["label"]))
     if cta and mode != "book":
