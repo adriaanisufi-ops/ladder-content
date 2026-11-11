@@ -1,5 +1,9 @@
 # Lessons (keep adding, newest at the top)
 
+## Winner check (Adriaan, 2026-11-11)
+- 2026-11-08-2 "Your wants are too cheap. / They never cost you anything." (Price Tag chapter, pex-28698188, near black aerial highway, B&W) is still doing better than the newer videos, including the flash format tests. It is the OLD format: about 18 s, small text (size 48), 60 BPM, 4 blocks, one calm clip.
+- Adriaan wants a recognisable signature for the account (one fixed visual setup, a different quote each time). Not decided yet.
+
 ## Flash format test (Adriaan, 2026-11-11, liked the first one)
 - One book quote in 2 lines (hook from frame 1, gold second line), over a montage that cuts every 0.75 s (80 BPM): Adriaan's rainy night photos (slow zoom) alternated with driving clips, black and white, about 9.75 s, seamless loop.
 - Build: segments with frame exact cut points (first segment 1.35 s because loop mode trims 0.6 s), concat to one montage, then reel.py with that montage as clip, "minlen": 12, one block. Photos are in the session uploads, not in git.
