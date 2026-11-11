@@ -1,5 +1,10 @@
 # Lessons (keep adding, newest at the top)
 
+## Flash format test (Adriaan, 2026-11-11, liked the first one)
+- One book quote in 2 lines (hook from frame 1, gold second line), over a montage that cuts every 0.75 s (80 BPM): Adriaan's rainy night photos (slow zoom) alternated with driving clips, black and white, about 9.75 s, seamless loop.
+- Build: segments with frame exact cut points (first segment 1.35 s because loop mode trims 0.6 s), concat to one montage, then reel.py with that montage as clip, "minlen": 12, one block. Photos are in the session uploads, not in git.
+- Waiting for numbers: compare with the 13.5 s default.
+
 ## DEFAULT FORMAT from 2026-11-09 (Adriaan, binding, replaces the 18 to 20 s loops)
 Every video is made like 2026-11-08-extra-1 ("You're not unmotivated. / You're vague."; spec in out/ is not in git, so the values are here):
 - Spec values: "beat": 0.75 (80 BPM), "minlen": 4, "size": 64, "hook_size": 76, "x": 80, "y0": 720, "blob" about 0.45 (up to 0.8 on busy footage), black and white ("pre" starts with "hue=s=0,"). NEVER the "label" field (no series label like "HARD TRUTH #1" on screen) and never "cta".
