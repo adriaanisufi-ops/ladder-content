@@ -1,5 +1,15 @@
 # Lessons (keep adding, newest at the top)
 
+## DEFAULT FORMAT from 2026-11-12: the ladder format (Adriaan, binding, replaces the 13.5 s format below)
+Adriaan sent the ladder remake of 2026-11-08-2 ("Your wants are too cheap.") and said: make ALL videos like this one. First batch in this format: 2026-11-12-1 to -4.
+- Spec values: "beat": 1.0 (60 BPM), "minlen": 4, "size": 48 (small text, no "hook_size"), "x": 96, "y0": 830, "ladder": true, "climb": 50, black and white ("pre" starts with "hue=s=0,"), "blob" at least 0.45. Never "label", never "cta". Mode loop, or book with "outro_cta": false on even days for video 4.
+- Length 18 s: 4 blocks; blocks 1 to 3 have 2 lines, block 4 has 3 lines (third line gold). The text climbs one step per block and the ladder on the left lights up one rung per gold line.
+- Lines at size 48: keep x + width under about 900 px (about 32 characters). Hook is a normal size first line, on screen from frame 1.
+- Footage: near black aerial night highways and roads, like the reference (pex-28698188, pex-11372905, pex-11326269, pex-28698336, pex-11372907). Prefer clips of at least 14 s so they don't get slowed down much; driving POV clips are fine too.
+- Sound: around 60 BPM (or 120) so the gold lines land on the beat.
+- VARIETY (Adriaan 2026-11-12: "er is genoeg te vertellen in het boek, dus niet de hele tijd dezelfde dingen"): rotate over all chapters in book.txt, including Part Five (True Freedom, The Art of Boredom, The Art of Detachment, The Art of Resistance, Your True Freedom, Conclusion). Before writing, read every earlier hook from that chapter in log.csv and pick a DIFFERENT passage and idea, not a reworded version of an earlier angle (the Gap, the parent/model and "that thought isn't you" angles have been used many times). Vary the shape too: not every hook a "You're not X" line; also commands, concrete lists and questions.
+- toolkit/reference/book.txt was replaced on 2026-11-12 with Adriaan's latest PDF (five Parts, 17 chapters).
+
 ## Winner check (Adriaan, 2026-11-11)
 - 2026-11-08-2 "Your wants are too cheap. / They never cost you anything." (Price Tag chapter, pex-28698188, near black aerial highway, B&W) is still doing better than the newer videos, including the flash format tests. It is the OLD format: about 18 s, small text (size 48), 60 BPM, 4 blocks, one calm clip.
 - Adriaan wants a recognisable signature for the account (one fixed visual setup, a different quote each time). Not decided yet.
@@ -9,7 +19,7 @@
 - Build: segments with frame exact cut points (first segment 1.35 s because loop mode trims 0.6 s), concat to one montage, then reel.py with that montage as clip, "minlen": 12, one block. Photos are in the session uploads, not in git.
 - Waiting for numbers: compare with the 13.5 s default.
 
-## DEFAULT FORMAT from 2026-11-09 (Adriaan, binding, replaces the 18 to 20 s loops)
+## Old default from 2026-11-09 (REPLACED on 2026-11-12 by the ladder format above)
 Every video is made like 2026-11-08-extra-1 ("You're not unmotivated. / You're vague."; spec in out/ is not in git, so the values are here):
 - Spec values: "beat": 0.75 (80 BPM), "minlen": 4, "size": 64, "hook_size": 76, "x": 80, "y0": 720, "blob" about 0.45 (up to 0.8 on busy footage), black and white ("pre" starts with "hue=s=0,"). NEVER the "label" field (no series label like "HARD TRUTH #1" on screen) and never "cta".
 - Length about 13.5 s: 4 blocks; blocks 1, 2 and 4 have 2 lines, block 3 may have 3. The last block flows back into the hook so the loop is seamless.
