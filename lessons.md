@@ -1,6 +1,21 @@
 # Lessons (keep adding, newest at the top)
 
-## DEFAULT FORMAT from 2026-11-12: the ladder format (Adriaan, binding, replaces the 13.5 s format below)
+## DEFAULT FORMAT from 2026-11-12 evening: the ladder dialog (Adriaan: "dit is perfect, maak vanaf nu 4 video's per dag op deze manier")
+Approved video: "Juist" = the dialog about The Gap (label "Expectation outrunning action"), re-rendered with the text inside the phone frame. Replaces the ladder text format below.
+- Render: python3 toolkit/ladder_dialog.py SPEC.json out/<day>-<n>.mp4 (spec example: toolkit/specs/example-dialog.json). No footage, no clips.json: the scene is drawn (silhouette, ladder, rain, gold).
+- Script shape: 6 lines, alternating "you" and "ladder", ending on the ladder. "you" opens with a relatable confession or question (on screen from frame 1), then a short follow up ("What gap?", "What do you mean?"), then "So how do I ...?". The ladder answers short, then explains, then gives the turn: a concrete action in short sentences (held about 9 s, that is the rewatch moment).
+- A label (the "title") names the idea in 2 to 4 words, like a psychology term ("Expectation outrunning action", "Rehearsal suffering", "Cheap dopamine", "Outcome gripping", "Performing to be chosen"). People save and share a name for what they feel.
+- Line length: "you" lines max about 12 words, ladder lines max about 18 words (the renderer warns when a line gets too many rows). Questions are short.
+- NO voice over (Adriaan 2026-11-12: he likes it without). Audio is only soft rain; he adds music in TikTok (he likes VYZEE by SOPHIE, drop on the start of the last answer). Always tell him the second the last answer starts.
+- Text must stay inside x 130 to 950: tall phones crop about 100 px off each side of a 9:16 video. The renderer's layout does this; still check frames.
+- Caption (Adriaan's choice): only the book.
+  From my book: Burning Desire, True Belief, Fierce Plan, Relentless Action.
+  (blank line) Comment BOOK and I'll send it to you.
+  (blank line) 3 hashtags, e.g. #selfimprovement #discipline #mindset
+  Plus one pinned comment question per video.
+- Variety: every video a different chapter and a different named idea; read earlier labels and hooks in log.csv (label goes in the clip column as "dialog: <label>").
+
+## Ladder text format from 2026-11-12 morning (REPLACED the same evening by the ladder dialog above)
 Adriaan sent the ladder remake of 2026-11-08-2 ("Your wants are too cheap.") and said: make ALL videos like this one. First batch in this format: 2026-11-12-1 to -4.
 - Spec values: "beat": 1.0 (60 BPM), "minlen": 4, "size": 48 (small text, no "hook_size"), "x": 96, "y0": 830, "ladder": true, "climb": 50, black and white ("pre" starts with "hue=s=0,"), "blob" at least 0.45. Never "label", never "cta". Mode loop, or book with "outro_cta": false on even days for video 4.
 - Length 18 s: 4 blocks; blocks 1 to 3 have 2 lines, block 4 has 3 lines (third line gold). The text climbs one step per block and the ladder on the left lights up one rung per gold line.

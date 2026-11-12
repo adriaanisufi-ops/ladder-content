@@ -1,0 +1,29 @@
+{
+ "title": "Expectation outrunning action",
+ "lines": [
+  {
+   "who": "you",
+   "text": "Why does every year feel faster than the last?"
+  },
+  {
+   "who": "ladder",
+   "text": "Because time isn't speeding up. The gap is."
+  },
+  {
+   "who": "you",
+   "text": "What gap?"
+  },
+  {
+   "who": "ladder",
+   "text": "The distance between who you expect yourself to be and who you're actually being."
+  },
+  {
+   "who": "you",
+   "text": "So how do I close it?"
+  },
+  {
+   "who": "ladder",
+   "text": "Stop raising the bar. Raise what you do. One real step today. Another tomorrow."
+  }
+ ]
+}
