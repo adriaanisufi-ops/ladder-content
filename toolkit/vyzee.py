@@ -322,6 +322,66 @@ def shot_figure(t, d, g, a, s):
     ground(d, a); gold = ease((t - T(s["gold"])) / .3) if "gold" in s else 0
     person(d, s.get("x", 540), GROUND, a * (1 - gold)); person(g, s.get("x", 540), GROUND, a * gold, col=GOLD)
 
+def phone_sq(d, cx, cy, a, k=1.0, fill=True):
+    if a <= 0.01: return
+    w, h = 54 * k, 92 * k
+    if fill: d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=int(10 * k), fill=WHITE + (int(240 * a),))
+    else: d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=int(10 * k), outline=WHITE + (int(240 * a),), width=4)
+
+def shot_gaps(t, d, g, a, s):
+    """a day as a line with empty gaps; something snaps into every gap. keys: gaps [{label, beat, snap}], rush [from, to] (many small gaps filling fast)"""
+    y = 900; d.line([150, y, 930, y], fill=WHITE + (int(150 * a),), width=3)
+    gaps = s["gaps"]; xs = [260 + i * (560 / max(1, len(gaps) - 1)) for i in range(len(gaps))]
+    for x, gp in zip(xs, gaps):
+        r = 70
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(8, 8, 10, int(255 * a)), outline=WHITE + (int(230 * a),), width=4)
+        text_c(d, gp["label"], y + 100, 26, a * ease((t - T(gp["beat"])) / .15), sp=4, cx=x)
+        if t >= T(gp["snap"]):
+            k = t - T(gp["snap"]); fl = math.exp(-k * 9)
+            phone_sq(d, x, y - 90 * math.exp(-k * 18), a, 1 + .2 * fl)
+            if fl > .05: d.ellipse([x - r - 30 * (1 - fl), y - r - 30 * (1 - fl), x + r + 30 * (1 - fl), y + r + 30 * (1 - fl)], outline=WHITE + (int(200 * a * fl),), width=3)
+    if "rush" in s:
+        rf, rt = T(s["rush"][0]), T(s["rush"][1]); n = 16
+        for i in range(n):
+            x = 170 + i * (740 / (n - 1)); ts = rf + i * (rt - rf) / n
+            if t < rf - .2 or min(abs(x - xx) for xx in xs) < 95: continue
+            d.ellipse([x - 14, y - 14, x + 14, y + 14], fill=(8, 8, 10, int(255 * a)), outline=WHITE + (int(200 * a),), width=3)
+            if t >= ts: phone_sq(d, x, y, a, .3)
+
+def shot_alarm(t, d, g, a, s):
+    """one empty circle (the gap) that alarms on every beat from 'start' until 'stop', then calms down until 'calm'.
+    a phone hovers at the edge and gets pulled in on every pulse, drifts away after 'stop'. keys: start, stop, calm"""
+    cx, cy, R = 540, 900, 230
+    st, sp, ca = s.get("start", DROP_BEAT), s["stop"], s["calm"]
+    k = 0.0; last = None
+    for b in range(int(st), int(ca) + 1):
+        if b > sp and (b - sp) % 2: continue
+        tb = T(b)
+        if tb <= t: last = (b, tb)
+    if last:
+        b, tb = last; amp = 1.0 if b < sp else max(0.0, 1 - (b - sp) / max(1, ca - sp)); k = amp * math.exp(-(t - tb) * 5)
+        for j in range(2):
+            rr = R + (t - tb) * (420 + j * 160); al = a * amp * cl(1 - (t - tb) / .55) * (.8 - j * .3)
+            if al > .02: d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], outline=WHITE + (int(255 * al),), width=4)
+    d.ellipse([cx - R, cy - R, cx + R, cy + R], fill=(250, 250, 252, int(200 * a * k)), outline=WHITE + (int(235 * a),), width=5)
+    pull = k if t < T(sp) else 0.0
+    away = ease((t - T(sp)) / max(.1, T(ca) - T(sp)))
+    px = cx + R + 120 - pull * 110 + away * 260
+    phone_sq(d, px, cy, a * (1 - away), 1.0)
+
+def shot_void(t, d, g, a, s):
+    """the same empty circle, quiet: stars appear inside from 'stars', the ring turns gold on 'gold'. keys: stars, gold"""
+    cx, cy = 540, 900; R = 230 + 25 * ease((t - T(s["from"])) / 6)
+    st = ease((t - T(s.get("stars", s["from"]))) / 3)
+    for (ang, sp_) in PARTS + PARTS[:10]:
+        rr = (sp_ - 250) / 350 * (R - 30); x, y = cx + math.cos(ang * 3.1) * rr, cy + math.sin(ang * 1.7) * rr
+        tw = .6 + .4 * math.sin(t * 2.5 + ang * 7)
+        if st * tw > .03: d.ellipse([x - 3, y - 3, x + 3, y + 3], fill=WHITE + (int(220 * a * st * tw),))
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=WHITE + (int(235 * a * (1 - gold)),), width=5)
+    if gold > 0:
+        g.ellipse([cx - R, cy - R, cx + R, cy + R], outline=GOLD + (int(255 * a * gold),), width=7)
+
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
 
 # ---------------------------------------------------------------- render
@@ -346,7 +406,7 @@ def frame(t, spec, LEN):
     gl = Image.new("RGBA", (W, H), (0, 0, 0, 0)); g = ImageDraw.Draw(gl)
     for s in spec["shots"]:
         t0, t1 = T(s["from"]), T(s["to"]) if "to" in s else LEN + 1
-        a = win(t, t0, t1, fi=s.get("fade_in", .03 if t0 > 0 else .01), fo=s.get("fade_out", .12))
+        a = win(t, t0, t1, fi=s.get("fade_in", .03), fo=s.get("fade_out", .12)) if t0 > 0 else cl((t1 - t) / s.get("fade_out", .12))
         if a > 0: SHOTS[s["type"]](t, d, g, a, s)
     draw_text(t, d, g, spec, LEN)
     lay.alpha_composite(gl)
@@ -375,7 +435,7 @@ def voice_track(spec, LEN, out_wav):
     track = np.zeros(int(LEN * SR)); prev = 0; report = []
     for ln in spec["lines"]:
         t0 = float(ln["at"]) if "at" in ln else T(ln["beat"]) + (0.03 if ln.get("beat") == DROP_BEAT else 0)
-        a, sr = k.create(ln["text"], voice=spec.get("voice", "am_michael"), speed=spec.get("speed", 1.05), lang="en-us")
+        a, sr = k.create(ln["text"], voice=spec.get("voice", "am_michael"), speed=ln.get("speed", spec.get("speed", 1.05)), lang="en-us")
         nz = np.where(np.abs(a) > 0.01)[0]; a = a[max(0, nz[0] - 150):nz[-1] + 600]; a = resample_poly(a, SR, sr)
         i = int(t0 * SR); j = min(len(track), i + len(a)); track[i:j] += a[:j - i]
         end = t0 + len(a) / SR
