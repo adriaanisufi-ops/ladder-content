@@ -1,0 +1,374 @@
+{
+ "title": "The bad day rule",
+ "chapter": "Build It the Size You Can Actually Carry",
+ "length": 45.0,
+ "lines": [
+  {
+   "at": 0.12,
+   "text": "Your plan only works on good days."
+  },
+  {
+   "beat": 4,
+   "text": "That's why it keeps breaking."
+  },
+  {
+   "beat": 8,
+   "text": "Monday, you crush it. Tuesday too."
+  },
+  {
+   "beat": 14,
+   "text": "Then one bad day hits."
+  },
+  {
+   "beat": 17,
+   "text": "No sleep. No energy. No mood."
+  },
+  {
+   "beat": 22,
+   "text": "The plan breaks. And so does the streak."
+  },
+  {
+   "beat": 26.5,
+   "text": "So build it for your worst day."
+  },
+  {
+   "beat": 31,
+   "text": "Step one. Pick the goal."
+  },
+  {
+   "beat": 34,
+   "text": "Step two. Shrink it until it's embarrassing."
+  },
+  {
+   "beat": 39,
+   "text": "Step three. That's your floor."
+  },
+  {
+   "beat": 42,
+   "text": "Step four. Never go below it.",
+   "speed": 1.15
+  },
+  {
+   "beat": 45,
+   "text": "Gym. Ten pushups.",
+   "speed": 1.22
+  },
+  {
+   "beat": 47,
+   "text": "Reading. One page.",
+   "speed": 1.22
+  },
+  {
+   "beat": 49.1,
+   "text": "Business. One message.",
+   "speed": 1.22
+  },
+  {
+   "beat": 51.25,
+   "text": "Running. Shoes on. One kilometer.",
+   "speed": 1.22
+  },
+  {
+   "beat": 55,
+   "text": "On a good day, do more."
+  },
+  {
+   "beat": 58,
+   "text": "On a bad day, do the floor."
+  },
+  {
+   "beat": 61,
+   "text": "Either way, the streak never breaks."
+  },
+  {
+   "beat": 67,
+   "text": "A plan that only works when you feel like it, isn't a plan.",
+   "speed": 1.15
+  },
+  {
+   "beat": 73,
+   "text": "It's a mood with a deadline."
+  },
+  {
+   "beat": 76,
+   "text": "Never go below the floor."
+  }
+ ],
+ "text": [
+  {
+   "from": 0,
+   "to": 4,
+   "big": "YOUR PLAN ONLY WORKS ON GOOD DAYS."
+  },
+  {
+   "from": 4,
+   "to": 8,
+   "big": "THAT'S WHY IT KEEPS BREAKING."
+  },
+  {
+   "from": 8,
+   "to": 14,
+   "pill": "GOOD DAYS",
+   "y": 330
+  },
+  {
+   "from": 14,
+   "to": 17,
+   "big": "THEN ONE BAD DAY HITS."
+  },
+  {
+   "from": 17,
+   "to": 22,
+   "big": "NO SLEEP. NO ENERGY. NO MOOD.",
+   "size": 56
+  },
+  {
+   "from": 22,
+   "to": 26,
+   "big": "THE PLAN BREAKS."
+  },
+  {
+   "from": 26,
+   "to": {
+    "t": 16.4
+   },
+   "big": "BUILD IT FOR YOUR WORST DAY.",
+   "size": 60
+  },
+  {
+   "from": 55,
+   "to": 58,
+   "pill": "GOOD DAY: DO MORE",
+   "y": 330
+  },
+  {
+   "from": 58,
+   "to": 61,
+   "pill": "BAD DAY: DO THE FLOOR",
+   "y": 330
+  },
+  {
+   "from": 61,
+   "to": {
+    "t": 36.8
+   },
+   "big": "THE STREAK NEVER BREAKS.",
+   "y": 300,
+   "size": 60
+  },
+  {
+   "from": 67,
+   "to": 72.8,
+   "big": "A PLAN THAT ONLY WORKS WHEN YOU FEEL LIKE IT ISN'T A PLAN.",
+   "y": 280,
+   "size": 50
+  },
+  {
+   "from": 73,
+   "to": 75.8,
+   "big": "IT'S A MOOD WITH A DEADLINE.",
+   "y": 300,
+   "size": 58
+  },
+  {
+   "from": 76,
+   "big": "NEVER BELOW THE FLOOR.",
+   "y": 300,
+   "size": 78,
+   "gold": true
+  }
+ ],
+ "shots": [
+  {
+   "type": "chart",
+   "from": 0,
+   "to": {
+    "t": 16.4
+   },
+   "fade_out": 0.25,
+   "checks": true,
+   "snap": 22,
+   "line": {
+    "level": 0.7,
+    "label": "YOUR PLAN",
+    "beat": 8
+   },
+   "bars": [
+    {
+     "h": 0.82,
+     "beat": 9,
+     "label": "MON"
+    },
+    {
+     "h": 0.86,
+     "beat": 11,
+     "label": "TUE"
+    },
+    {
+     "h": 0.78,
+     "beat": 13,
+     "label": "WED"
+    },
+    {
+     "h": 0.22,
+     "beat": 15,
+     "label": "THU"
+    },
+    {
+     "h": 0.03,
+     "beat": 24,
+     "label": "FRI"
+    },
+    {
+     "h": 0.03,
+     "beat": 25,
+     "label": "SAT"
+    },
+    {
+     "h": 0.03,
+     "beat": 26,
+     "label": "SUN"
+    }
+   ]
+  },
+  {
+   "type": "numbered",
+   "from": 31,
+   "to": 44.9,
+   "title": "THE BAD DAY RULE",
+   "y": 660,
+   "items": [
+    {
+     "text": "PICK THE GOAL",
+     "beat": 31
+    },
+    {
+     "text": "SHRINK IT UNTIL IT'S EMBARRASSING",
+     "beat": 34
+    },
+    {
+     "text": "THAT'S YOUR FLOOR",
+     "beat": 39
+    },
+    {
+     "text": "NEVER GO BELOW IT",
+     "beat": 42
+    }
+   ]
+  },
+  {
+   "type": "convert",
+   "from": 45,
+   "to": 54.9,
+   "header": "EXAMPLES",
+   "y": 660,
+   "rows": [
+    {
+     "a": "GYM",
+     "b": "10 PUSHUPS",
+     "beat": 45
+    },
+    {
+     "a": "READ",
+     "b": "1 PAGE",
+     "beat": 47
+    },
+    {
+     "a": "BUSINESS",
+     "b": "1 MESSAGE",
+     "beat": 49
+    },
+    {
+     "a": "RUN",
+     "b": "1 KM",
+     "beat": 51
+    }
+   ]
+  },
+  {
+   "type": "chart",
+   "from": 55,
+   "to": {
+    "t": 36.8
+   },
+   "checks": true,
+   "top": 700,
+   "line": {
+    "level": 0.2,
+    "label": "FLOOR",
+    "beat": 55,
+    "floor": true
+   },
+   "bars": [
+    {
+     "h": 0.9,
+     "beat": 55
+    },
+    {
+     "h": 0.35,
+     "beat": 55.5
+    },
+    {
+     "h": 0.7,
+     "beat": 56
+    },
+    {
+     "h": 0.22,
+     "beat": 56.5
+    },
+    {
+     "h": 0.6,
+     "beat": 57
+    },
+    {
+     "h": 0.95,
+     "beat": 57.5
+    },
+    {
+     "h": 0.25,
+     "beat": 58
+    },
+    {
+     "h": 0.5,
+     "beat": 58.5
+    },
+    {
+     "h": 0.8,
+     "beat": 59
+    },
+    {
+     "h": 0.3,
+     "beat": 59.5
+    },
+    {
+     "h": 0.65,
+     "beat": 60
+    },
+    {
+     "h": 0.23,
+     "beat": 60.5
+    },
+    {
+     "h": 0.85,
+     "beat": 61
+    },
+    {
+     "h": 0.55,
+     "beat": 61.5
+    }
+   ]
+  },
+  {
+   "type": "streak",
+   "from": {
+    "t": 36.8
+   },
+   "start": 67,
+   "end": 75,
+   "gold": 76,
+   "counter": false,
+   "y": 760,
+   "fade_in": 0.5
+  }
+ ]
+}

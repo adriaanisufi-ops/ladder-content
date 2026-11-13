@@ -270,12 +270,16 @@ def shot_week(t, d, g, a, s):
 
 def shot_streak(t, d, g, a, s):
     """30 dots lighting up with a DAY counter. keys: start, end (beats)"""
-    lit = int(cl((t - T(s.get("start", s["from"]))) / max(.1, T(s.get("end", s["to"])) - T(s.get("start", s["from"])))) * 30)
+    end = s["end"] if "end" in s else s["to"]
+    lit = int(cl((t - T(s.get("start", s["from"]))) / max(.1, T(end) - T(s.get("start", s["from"])))) * 30)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0; y0 = s.get("y", 720)
     for i in range(30):
-        r, c = divmod(i, 6); x, y = 300 + c * 96, 720 + r * 96
-        if i < lit: d.ellipse([x - 20, y - 20, x + 20, y + 20], fill=WHITE + (int(240 * a),))
+        r, c = divmod(i, 6); x, y = 300 + c * 96, y0 + r * 96
+        if i < lit:
+            d.ellipse([x - 20, y - 20, x + 20, y + 20], fill=WHITE + (int(240 * a * (1 - gold)),))
+            if gold > 0: g.ellipse([x - 20, y - 20, x + 20, y + 20], fill=GOLD + (int(255 * a * gold),))
         else: d.ellipse([x - 20, y - 20, x + 20, y + 20], outline=WHITE + (int(110 * a),), width=3)
-    text_c(d, f"DAY {max(1, lit)}", 480, 120, a)
+    if s.get("counter", True): text_c(d, f"DAY {max(1, lit)}", y0 - 240, 120, a)
 
 def shot_bigbar(t, d, g, a, s):
     """one huge bar ("ONE BIG DAY") next to the figure, crossed out at 'cross'. keys: label, cross"""
@@ -381,6 +385,76 @@ def shot_void(t, d, g, a, s):
     d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=WHITE + (int(235 * a * (1 - gold)),), width=5)
     if gold > 0:
         g.ellipse([cx - R, cy - R, cx + R, cy + R], outline=GOLD + (int(255 * a * gold),), width=7)
+
+def shot_chart(t, d, g, a, s):
+    """bar chart of days with a horizontal line (the plan, or the floor).
+    keys: bars [{h (0..1), beat, label}], line {level (0..1), label, beat}, snap (beat: the line cracks where a bar is below it),
+    checks true (a check above every bar that reaches the line; for a floor: every bar above it), base y, top y"""
+    x0, x1, yb, yt = 170, 910, s.get("base", 1180), s.get("top", 640)
+    bars = s["bars"]; n = len(bars); cw = (x1 - x0) / n; bw = min(70, cw * .6)
+    d.line([x0 - 10, yb, x1 + 10, yb], fill=WHITE + (int(170 * a),), width=3)
+    ln = s.get("line"); ly = yb - (yb - yt) * ln["level"] if ln else None
+    snap = T(s["snap"]) if "snap" in s else None
+    for i, b in enumerate(bars):
+        cx = x0 + cw * (i + .5); gr = ease((t - T(b["beat"])) / .2); h = (yb - yt) * b["h"] * gr
+        if gr <= 0: continue
+        d.rounded_rectangle([cx - bw / 2, yb - h, cx + bw / 2, yb], radius=8, fill=WHITE + (int(225 * a),))
+        if b.get("label"): text_c(d, b["label"], yb + 16, 20 if n > 8 else 24, a * .7, sp=2, cx=cx)
+        if ln and s.get("checks") and gr >= 1:
+            ok = b["h"] >= ln["level"] if not ln.get("floor") else b["h"] >= ln["level"]
+            if ok: check(d, cx, yb - h - 40, 30, a, (t - T(b["beat"]) - .2) / .15)
+            elif snap is not None and t >= snap: cross(d, cx, yb - h - 46, 18, a, (t - snap) / .3)
+    if ln and t >= T(ln.get("beat", s["from"])):
+        la = a * ease((t - T(ln.get("beat", s["from"]))) / .2)
+        if snap is not None and t >= snap:
+            # the line cracks at the first bar that is below it and falls
+            bi = next(i for i, b in enumerate(bars) if b["h"] < ln["level"]); cx = x0 + cw * (bi + .5); k = t - snap
+            drop = min(260, 900 * k * k); fade = cl(1 - k / .9)
+            d.line([x0 - 10, ly, cx - 10, ly + 6], fill=WHITE + (int(240 * la),), width=5)
+            if fade > 0: d.line([cx + 10, ly + drop, x1 + 10, ly + drop * .55], fill=WHITE + (int(240 * la * fade),), width=5)
+            for j in range(6):
+                ang = j * 1.1; rr = 20 + 120 * ease(k / .5); al = la * cl(1 - k / .6)
+                if al > .02: d.ellipse([cx + math.cos(ang) * rr - 4, ly + math.sin(ang) * rr - 4, cx + math.cos(ang) * rr + 4, ly + math.sin(ang) * rr + 4], fill=WHITE + (int(255 * al),))
+        else:
+            col = GOLD if ln.get("gold") else WHITE; lay = g if ln.get("gold") else d
+            for x in range(int(x0 - 10), int(x1 + 10), 26): lay.line([x, ly, x + 14, ly], fill=col + (int(240 * la),), width=5)
+        if ln.get("label"): pill(d, ln["label"], ly - 34, la, cx=x1 - 70, sz=20)
+
+def shot_numbered(t, d, g, a, s):
+    """a numbered method, one step per beat; earlier steps stay (dimmed). keys: items [{text, beat}], y, gap, title"""
+    y0, gap = s.get("y", 470), s.get("gap", 150)
+    if s.get("title"): text_c(d, s["title"], y0 - 120, 30, a * .85, sp=8)
+    cur = max([i for i, it in enumerate(s["items"]) if t >= T(it["beat"])], default=-1)
+    for i, it in enumerate(s["items"]):
+        if t < T(it["beat"]): continue
+        k = t - T(it["beat"]); al = a * ease(k / .12) * (1.0 if i == cur else .55); y = y0 + i * gap
+        sc_ = 1 + .25 * math.exp(-k * 14)
+        r = 34 * sc_; cx = 210
+        d.ellipse([cx - r, y - r, cx + r, y + r], fill=WHITE + (int(240 * al),))
+        text_c(d, str(i + 1), y - 26 * sc_, int(40 * sc_), al, col=INK, sp=0, cx=cx)
+        lines = wrap_lines(d, it["text"], 40, 640, 2)
+        f = font(40)
+        for j, l in enumerate(lines):
+            x = 270
+            for c in l:
+                d.text((x, y - 24 - (len(lines) - 1) * 24 + j * 50), c, font=f, fill=WHITE + (int(255 * al),)); x += d.textlength(c, font=f) + 2
+
+def shot_convert(t, d, g, a, s):
+    """rows: big goal -> its floor, one row per beat. keys: rows [{a, b, beat}], y, gap, header"""
+    y0, gap = s.get("y", 520), s.get("gap", 150)
+    if s.get("header"): text_c(d, s["header"], y0 - 140, 30, a * .85, sp=8)
+    for i, r in enumerate(s["rows"]):
+        if t < T(r["beat"]): continue
+        k = t - T(r["beat"]); y = y0 + i * gap; al = a * ease(k / .12)
+        text_c(d, r["a"], y - 24, 40, al * .55, cx=300, sp=3)
+        ar = ease((k - .1) / .25)
+        if ar > 0:
+            d.line([440, y, 440 + 90 * ar, y], fill=WHITE + (int(230 * al),), width=4)
+            if ar > .9: d.polygon([(530, y), (512, y - 10), (512, y + 10)], fill=WHITE + (int(230 * al),))
+        bk = ease((k - .3) / .15)
+        if bk > 0:
+            sc_ = 1 + .3 * math.exp(-(k - .3) * 14)
+            text_c(d, r["b"], y - 28 * sc_, int(46 * sc_), al * bk, cx=740, sp=3)
 
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
 
