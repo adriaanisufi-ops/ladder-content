@@ -13,6 +13,14 @@ Approved video: "Juist" = the dialog about The Gap (label "Expectation outrunnin
   (blank line) Comment BOOK and I'll send it to you.
   (blank line) 3 hashtags, e.g. #selfimprovement #discipline #mindset
   Plus one pinned comment question per video.
+- WRITE DEEPER (Adriaan 2026-11-13: "het kan kwa tekst beter, we kunnen ze meer diep raken"). Not advice, recognition. The arc:
+  1. you: a raw 2am confession with one concrete detail (an age, a habit, a moment), something people never say out loud. Not a neutral "Why do I...?" question.
+  2. ladder: a short reframe that names what is really going on, max about 8 words ("You're not behind. You're auditing.").
+  3. you: the pain behind it, or a scared follow up ("What if they leave when they see the rest?").
+  4. ladder: the line that hurts, taken almost word for word from the book (Adriaan's strongest sentences: "you were somewhere else while it happened", "a version of yourself that only exists as an idea", "guilt has never once kept a promise", "old pain signing your name to choices you never made", "they loved the edited cut", "cheap wants never cost you anything, that's why they never build anything").
+  5. you: quiet surrender ("So what do I do?").
+  6. ladder: permission plus one small true step, ending on a line worth a screenshot. Max about 14 words.
+  Example approved direction: 2026-11-13-deep-1 "The edited version" (People like me. But only the version I let them see.). Labels name the feeling, not a textbook term.
 - Variety: every video a different chapter and a different named idea; read earlier labels and hooks in log.csv (label goes in the clip column as "dialog: <label>").
 
 ## Ladder text format from 2026-11-12 morning (REPLACED the same evening by the ladder dialog above)
