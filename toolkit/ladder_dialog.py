@@ -258,6 +258,9 @@ def check():
         n = len(wrap(d, s["text"], F_Q if s["who"] == "you" else F_A, 260 if s["who"] == "you" else 290))
         lim = 6 if s["who"] == "you" else 8
         if n > lim: print(f"WARNING: too long ({n} lines, max {lim}): {s['text']}")
+        f, wmax = (F_Q, 260) if s["who"] == "you" else (F_A, 290)
+        for wd in s["text"].split():
+            if d.textlength(wd, font=f) > wmax: print(f"WARNING: word too wide for the column, rephrase: {wd}")
     print("timing:", ", ".join(f"{s['who']} {s['start']}-{s['end']}" for s in segs), "| length", T_END, "| last answer at", segs[-1]["start"])
 check()
 
