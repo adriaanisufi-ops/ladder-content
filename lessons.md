@@ -1,6 +1,18 @@
 # Lessons (keep adding, newest at the top)
 
-## DEFAULT FORMAT from 2026-11-12 evening: the ladder dialog (Adriaan: "dit is perfect, maak vanaf nu 4 video's per dag op deze manier")
+## DEFAULT FORMAT from 2026-11-13: VYZEE explainers (Adriaan: "this is good, make this kind of stuff always")
+Approved video: "Price Tags" (spec: toolkit/specs/example-vyzee-price-tags.json). Replaces the ladder dialog below.
+- Look: minimal glowing white line animation on black (little figure, shop window, tags, receipts, stairs, big glowing words, white pills), ONE gold moment at the end. Style reference: Adriaan's "Or we could go up" video.
+- Sound: an AI voice (Kokoro am_michael, speed 1.05) is ALWAYS there. NO music in the file: Adriaan adds VYZEE (SOPHIE) in TikTok with "Use this sound" from his reference video, starting at 0:00. Deliver ONE file per video (voice only), never a second version with music.
+- Everything is timed to the VYZEE beat grid in toolkit/vyzee.py: calm intro 0 to 16.4 s (hook + build + a question), silence at 16.4 s, DROP at 17.18 s (beat 31: the payoff starts exactly there, one hit per beat), loud part until 36.8 s, quiet part after 36.8 s for the emotional line and the gold finale. Length about 40 to 45 s.
+- Render: python3 toolkit/vyzee.py SPEC.json out/<day>/<day>-<n>.mp4 (downloads the Kokoro voice the first time). Shot types: window, slam, versus, steps, bubble, week, streak, bigbar, check, tag_finale, ladder_finale, figure; text items: big, pill, small. Read the docstring and the example spec.
+- Be creative: every video is ONE visual metaphor from one chapter (Price Tags = a shop window of dreams whose tags hide the real price). Other ideas Adriaan saw: elevator vs stairs (Ladder Not Bubble, Don't Break the Streak), phone vs ladder (The Art of Boredom). Invent new ones per chapter; never reuse a metaphor that is in log.csv.
+- Hook in the first second, on screen and spoken: provocative and personal ("You can't afford your dreams." / "And it's not about money."). End the intro on a question right before the silence ("Want to see what it really costs?") so the drop answers it.
+- Words: stay close to Adriaan's own sentences from book.txt; short spoken lines; never any dash character.
+- When Adriaan is in the chat, pitch the concept and ask him before building (he asked for that on 2026-11-13). In the unattended daily run, pick the concepts yourself and say in the message what each one is.
+- Caption: the book only (see the dialog section below), plus a pinned comment question per video.
+
+## Ladder dialog from 2026-11-12 evening (REPLACED on 2026-11-13 by the VYZEE explainers above) (Adriaan: "dit is perfect, maak vanaf nu 4 video's per dag op deze manier")
 Approved video: "Juist" = the dialog about The Gap (label "Expectation outrunning action"), re-rendered with the text inside the phone frame. Replaces the ladder text format below.
 - Render: python3 toolkit/ladder_dialog.py SPEC.json out/<day>-<n>.mp4 (spec example: toolkit/specs/example-dialog.json). No footage, no clips.json: the scene is drawn (silhouette, ladder, rain, gold).
 - Script shape: 6 lines, alternating "you" and "ladder", ending on the ladder. "you" opens with a relatable confession or question (on screen from frame 1), then a short follow up ("What gap?", "What do you mean?"), then "So how do I ...?". The ladder answers short, then explains, then gives the turn: a concrete action in short sentences (held about 9 s, that is the rewatch moment).

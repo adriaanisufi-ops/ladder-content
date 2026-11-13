@@ -1,0 +1,50 @@
+{
+ "title": "Price tags",
+ "chapter": "The Price Tag You Keep Avoiding",
+ "length": 44.5,
+ "voice": "am_michael",
+ "lines": [
+  {"at": 0.12, "text": "You can't afford your dreams."},
+  {"beat": 4,  "text": "And it's not about money."},
+  {"beat": 8,  "text": "You priced the destination, in loving detail."},
+  {"beat": 16, "text": "But you never turned the tag around."},
+  {"beat": 25, "text": "Want to see what it really costs?"},
+  {"beat": 31, "text": "Five A M."},
+  {"beat": 33, "text": "Your comfort."},
+  {"beat": 35, "text": "Your evenings."},
+  {"beat": 37, "text": "The friends who need you small."},
+  {"beat": 40, "text": "Years where nothing seems to happen."},
+  {"beat": 45, "text": "It was always the price. You just never looked."},
+  {"beat": 51, "text": "A wish wants it delivered."},
+  {"beat": 54, "text": "A desire pays for it."},
+  {"beat": 57, "text": "The ones that hurt to pay for, are the only ones that change your life."},
+  {"beat": 67, "text": "Cheap wants never cost you anything."},
+  {"beat": 71, "text": "That's why they never build anything."}
+ ],
+ "text": [
+  {"from": 0,  "to": 4,  "big": "YOU CAN'T AFFORD YOUR DREAMS."},
+  {"from": 4,  "to": 7.9, "big": "AND IT'S NOT ABOUT MONEY."},
+  {"from": 8,  "to": 15.9, "pill": "YOU PRICED THE DESTINATION"},
+  {"from": 16, "to": 24.9, "pill": "BUT NEVER TURNED THE TAG"},
+  {"from": 25, "to": {"t": 16.4}, "big": "WANT TO SEE WHAT IT REALLY COSTS?", "y": 230, "size": 56},
+  {"from": 45, "to": 50, "big": "IT WAS ALWAYS THE PRICE.", "y": 520, "size": 70},
+  {"from": 57, "to": {"t": 36.8}, "pill": "THE ONES THAT HURT TO PAY FOR", "y": 520, "size": 30},
+  {"from": 60, "to": {"t": 36.8}, "big": "ARE THE ONLY ONES", "y": 680},
+  {"from": 62, "to": {"t": 36.8}, "big": "THAT CHANGE YOUR LIFE.", "y": 780, "size": 72},
+  {"from": 67, "to": 75, "pill": "CHEAP WANTS NEVER COST YOU ANYTHING", "y": 330, "size": 26},
+  {"from": 71, "to": 75.5, "big": "THAT'S WHY THEY NEVER BUILD ANYTHING.", "y": 420, "size": 52}
+ ],
+ "shots": [
+  {"type": "window", "from": 0, "to": 31, "sign": "DREAMS", "walk": [8, 16], "reach": [18, 23], "light": [10, 12, 14],
+   "items": [{"label": "THE BODY", "icon": "dumbbell", "price": "5 AM"},
+             {"label": "THE BUSINESS", "icon": "bars", "price": "YOUR COMFORT"},
+             {"label": "FREEDOM", "icon": "sun", "price": "YOUR EVENINGS"}]},
+  {"type": "slam", "from": 31, "to": 50, "header": "THE REAL PRICE",
+   "items": [{"text": "5 AM", "beat": 31}, {"text": "YOUR COMFORT", "beat": 33}, {"text": "YOUR EVENINGS", "beat": 35},
+             {"text": "FRIENDS WHO NEED YOU SMALL", "beat": 37, "short": "SMALL FRIENDS"},
+             {"text": "YEARS WHERE NOTHING SEEMS TO HAPPEN", "beat": 40, "short": "QUIET YEARS"}],
+   "total": {"label": "TOTAL", "value": "THE OLD YOU", "beat": 45}},
+  {"type": "versus", "from": 51, "to": 57, "a": "A WISH", "a_sub": "WANTS IT DELIVERED.", "sub_beat": 52, "b": "A DESIRE", "b_sub": "PAYS FOR IT.", "b_beat": 54},
+  {"type": "tag_finale", "from": {"t": 36.8}, "at": 75, "before": "YOUR DREAM", "after": "PAID.", "fade_in": 0.6}
+ ]
+}
