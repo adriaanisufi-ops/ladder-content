@@ -456,6 +456,128 @@ def shot_convert(t, d, g, a, s):
             sc_ = 1 + .3 * math.exp(-(k - .3) * 14)
             text_c(d, r["b"], y - 28 * sc_, int(46 * sc_), al * bk, cx=740, sp=3)
 
+
+def shot_edges(t, d, g, a, s):
+    """a vague goal is a wobbling cloud; at 'snap' it gets hard edges (a box), pills land on its edges one per beat.
+    keys: labels [{text, beat}] (inside text, last one wins), snap, pills [{text, beat, pos "top"|"bottom"|"under"}], fade [from, to] (cloud fades), gold, cy"""
+    cx, cy = 540, s.get("cy", 900); hw, hh = 320, 200
+    k = ease((t - T(s["snap"])) / .25) if "snap" in s else 0.0
+    fa = 1.0
+    if "fade" in s and k <= 0: fa = 1 - .75 * ease((t - T(s["fade"][0])) / max(.1, T(s["fade"][1]) - T(s["fade"][0])))
+    gold = ease((t - T(s["gold"])) / .35) if "gold" in s else 0
+    pts = []
+    for i in range(72):
+        ang = i / 72 * 2 * math.pi
+        r = 1 + .13 * math.sin(3 * ang + t * 1.7) + .08 * math.sin(5 * ang - t * 2.3) + .05 * math.sin(7 * ang + t * 3.1)
+        bx, by = math.cos(ang) * hw * .95 * r, math.sin(ang) * hh * 1.1 * r
+        m = max(abs(math.cos(ang)) / hw, abs(math.sin(ang)) / hh); rx, ry = math.cos(ang) / m, math.sin(ang) / m
+        pts.append((cx + bx + (rx - bx) * k, cy + by + (ry - by) * k))
+    if gold < 1: d.polygon(pts, outline=WHITE + (int(235 * a * fa * (1 - gold)),), width=5 if k > .5 else 4)
+    if gold > 0: g.polygon(pts, outline=GOLD + (int(255 * a * gold),), width=7)
+    labs = [l for l in s.get("labels", []) if t >= T(l["beat"])]
+    if labs:
+        l = labs[-1]; sc_ = 1 + .2 * math.exp(-(t - T(l["beat"])) * 12)
+        lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+        big(lay, l["text"], cy - 40 * sc_ - (20 if len(l["text"]) > 14 else 0), int(l.get("size", 48) * sc_), a * fa * ease((t - T(l["beat"])) / .12), col, maxw=480)
+    for pl in s.get("pills", []):
+        if t < T(pl["beat"]): continue
+        y = {"top": cy - hh, "bottom": cy + hh, "under": cy + hh + 110}[pl.get("pos", "top")]
+        sc_ = 1 + .3 * math.exp(-(t - T(pl["beat"])) * 14)
+        pill(d, pl["text"], y, a * ease((t - T(pl["beat"])) / .1), sz=int(34 * sc_))
+
+def shot_nail(t, d, g, a, s):
+    """a belief is a nail on a board: said once it sits on the surface and tips over at 'tip'; every strike (beat)
+    drives it deeper with a hammer flash, taps are small strikes. keys: strikes [beats], taps [beats], tip, stand, gold, label, by (board y)"""
+    by = s.get("by", 1180); L = 300; cx = 540
+    strikes = s.get("strikes", []); taps = s.get("taps", [])
+    depth = sum(.17 for b in strikes if t >= T(b)) + sum(.012 for b in taps if t >= T(b))
+    last = max([T(b) for b in strikes + taps if t >= T(b)], default=None)
+    if last is not None:
+        dk = t - last; depth -= (.17 if last in [T(b) for b in strikes] else .012) * math.exp(-dk * 25)
+    depth = min(s.get("max_depth", .72), max(0, depth))
+    tip = 0.0
+    if "tip" in s and t >= T(s["tip"]): tip = ease((t - T(s["tip"])) / .35)
+    if "stand" in s and t >= T(s["stand"]): tip *= 1 - ease((t - T(s["stand"])) / .25)
+    gold = ease((t - T(s["gold"])) / .35) if "gold" in s else 0
+    c = WHITE + (int(230 * a),)
+    d.line([150, by, 930, by], fill=c, width=5)
+    for i in range(5):
+        y = by + 30 + i * 32; d.line([170 + i * 23, y, 910 - i * 31, y], fill=WHITE + (int(70 * a),), width=2)
+    vis = L * (1 - depth); ang = tip * math.radians(78)
+    bx, byy = cx, by
+    tx, ty = bx + math.sin(ang) * vis, byy - math.cos(ang) * vis
+    lay, col = (g, GOLD) if gold > 0 else (d, WHITE); al = a * (gold if gold > 0 else 1)
+    if gold > 0 and gold < 1:
+        d.line([bx, byy, tx, ty], fill=WHITE + (int(240 * a * (1 - gold)),), width=12)
+    lay.line([bx, byy, tx, ty], fill=col + (int(240 * al),), width=12)
+    hx, hy = math.cos(ang) * 46, math.sin(ang) * 46
+    lay.line([tx - hx, ty - hy, tx + hx, ty + hy], fill=col + (int(250 * al),), width=18)
+    if last is not None and t - last < .35 and last in [T(b) for b in strikes]:
+        q = (t - last) / .35
+        d.rounded_rectangle([cx - 90, ty - 120 - 40 * q, cx + 90, ty - 40 - 40 * q], radius=10, fill=WHITE + (int(240 * a * (1 - q)),))
+        for j in range(8):
+            an = math.pi + j * math.pi / 7; rr = 60 + 160 * q
+            d.line([cx + math.cos(an) * rr * .6, ty + math.sin(an) * rr * .6, cx + math.cos(an) * rr, ty + math.sin(an) * rr], fill=WHITE + (int(200 * a * (1 - q)),), width=4)
+    if s.get("label") and tip < .1:
+        pill(lay, s["label"], ty - 90, al * (1 - tip * 8), sz=30)
+
+def shot_scale(t, d, g, a, s):
+    """a ledger as a balance: blocks drop on the left (MISSING) or right (ALREADY TRUE) on their beat, the beam tilts.
+    keys: left [{text, beat}], right [{text, beat}], heads [left, right], gold, cy"""
+    cx, cy = 540, s.get("cy", 760)
+    nl = sum(1 for b in s.get("left", []) if t >= T(b["beat"])); nr = sum(1 for b in s.get("right", []) if t >= T(b["beat"]))
+    tilt = max(-.32, min(.32, (nl - nr) * .09)); gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    c = WHITE + (int(230 * a),)
+    d.line([cx, cy, cx, cy + 520], fill=c, width=6); d.line([cx - 110, cy + 520, cx + 110, cy + 520], fill=c, width=6)
+    d.polygon([(cx - 22, cy - 6), (cx + 22, cy - 6), (cx, cy - 40)], fill=c)
+    arm = 255
+    for side, key in ((-1, "left"), (1, "right")):
+        ex, ey = cx + side * arm * math.cos(tilt), cy + side * arm * math.sin(tilt)
+        py = ey + 170
+        lay, col = (g, GOLD) if (gold > 0 and side == 1) else (d, WHITE); al = a * (gold if lay is g else 1)
+        if lay is g: pass
+        d.line([cx, cy, ex, ey], fill=c, width=6)
+        d.line([ex, ey, ex - 105, py], fill=WHITE + (int(170 * a),), width=3); d.line([ex, ey, ex + 105, py], fill=WHITE + (int(170 * a),), width=3)
+        lay.line([ex - 125, py, ex + 125, py], fill=col + (int(235 * al),), width=6)
+        if s.get("heads"): text_c(d, s["heads"][0 if side < 0 else 1], py + 26, 24, a * .75, sp=4, cx=ex)
+        y = py - 4
+        for b in s.get(key, []):
+            if t < T(b["beat"]): continue
+            k = t - T(b["beat"]); fall = (1 - ease(k / .22)) * 260
+            f = font(26); w = min(230, spaced_w(d, b["text"], f, 2) + 30)
+            box = [ex - w / 2, y - 52 - fall, ex + w / 2, y - fall]
+            lay.rounded_rectangle(box, radius=8, outline=col + (int(235 * al * ease(k / .1)),), width=4)
+            text_c(lay, b["text"], y - 42 - fall, 26, al * ease(k / .1), col=col, sp=2, cx=ex)
+            y -= 58
+
+def shot_house(t, d, g, a, s):
+    """the mind as a house: the host (figure) stays inside, thoughts are visitors (words) that come in through the door
+    and leave through the roof. keys: visitors [{text, in, out}], light (beat: the windows light up), gold, cy"""
+    cx = 540; base = s.get("base", 1260); top = base - 480; x0, x1 = 300, 780
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    lay, col = (g, GOLD) if gold > 0 else (d, WHITE); al = a * (gold if gold > 0 else 1)
+    if 0 < gold < 1: lay2 = d
+    for L_, C_, A_ in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if A_ <= .01: continue
+        c = C_ + (int(235 * A_),)
+        L_.line([x0, top, x0, base], fill=c, width=5); L_.line([x1, top, x1, base], fill=c, width=5)
+        L_.line([(x0 - 30, top + 10), (cx, top - 200), (x1 + 30, top + 10)], fill=c, width=5, joint="curve")
+        L_.line([x0 - 40, base, x1 + 40, base], fill=c, width=4)
+        L_.rectangle([cx - 210, base - 170, cx - 120, base], outline=c, width=4)
+        person(L_, 660, base, A_, 1.0, C_)
+    if "light" in s:
+        li = ease((t - T(s["light"])) / .3)
+        if li > 0: g.rectangle([cx + 60, top + 60, cx + 170, top + 150], outline=GOLD + (int(220 * a * li),), width=4)
+    for vi, v in enumerate(s.get("visitors", [])):
+        ti, to = T(v["in"]), T(v["out"])
+        if t < ti or t > to + .9: continue
+        p_in = ease((t - ti) / .45); p_out = ease((t - to) / .8)
+        x = cx - 165 + (cx - (cx - 165)) * p_in; y = base - 60 - (base - 60 - (top + 70 + v.get("slot", 0) * 64)) * p_in
+        y -= p_out * 420; al_ = a * cl((t - ti) / .15) * (1 - p_out)
+        sz = 36
+        while spaced_w(d, v["text"], font(sz), 3) > 440 and sz > 22: sz -= 2
+        text_c(d, v["text"], y - sz / 2, sz, al_ * .9, sp=3, cx=x if p_in < 1 else cx)
+
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
 
 # ---------------------------------------------------------------- render
