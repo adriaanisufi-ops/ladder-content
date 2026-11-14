@@ -17,6 +17,10 @@ Spec:
   text        [{"from": 0, "to": 4, "big": "..."} | {"pill": "..."} | {"small": "..."}, optional "y", "size", "gold"]
               on-screen words; from/to are beat numbers (floats ok) or {"t": seconds}; "to" may be omitted
   shots       graphics, each {"type": ..., "from": beat, "to": beat, ...}; see SHOTS below
+  sound       beat profile in toolkit/sounds/<name>.json (default vyzee). New sounds: python3 toolkit/beatmap.py SOUND OUT.json
+  punch       "drop" (camera punch on every beat of the loud part) or a list of beats; punch_amount (default .035)
+  comment_q   {"from": beat, "text": "WHICH STEP DO YOU SKIP? 1, 2, 3 OR 4?"}: the comment question in big white text at the end (y 560, under the gold line)
+  hook_type   claim | stop | question | proof (for the score and the weekly review). Rules: FORMULA.md, check: toolkit/score.py
 Beat numbers refer to GRID (index into the measured beats). Beat 31 is the drop. Use "t" for exact seconds.
 """
 import json, math, os, subprocess, sys, tempfile
@@ -37,6 +41,13 @@ GRID = [0.09, 0.65, 1.21, 1.74, 2.3, 2.86, 3.39, 3.95, 4.5, 5.06, 5.62, 6.15, 6.
         39.22, 39.78, 40.31, 40.87, 41.42, 41.98, 42.54, 43.09, 43.64, 44.19, 44.75, 45.3, 45.86, 46.41, 46.97, 47.52, 48.08,
         48.63, 49.18, 49.74, 50.29, 50.85, 51.4, 51.96, 52.51, 53.07]
 SILENCE, DROP_BEAT, BREAK_T = 16.4, 31, 36.8
+
+def load_sound(name):
+    """switch the beat grid to another sound profile (toolkit/sounds/<name>.json, made with toolkit/beatmap.py)"""
+    global GRID, SILENCE, DROP_BEAT, BREAK_T
+    pr = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "sounds", name + ".json")))
+    GRID, SILENCE, DROP_BEAT, BREAK_T = pr["grid"], pr["silence"], pr["drop_beat"], pr["break_t"]
+    return pr
 
 def T(v):
     """beat number (float ok) or {"t": seconds} -> seconds"""
@@ -597,6 +608,19 @@ def draw_text(t, d, g, spec, LEN):
         elif "pill" in it: pill(lay, it["pill"], it.get("y", 300), a, sz=it.get("size", 32))
         elif "small" in it: text_c(lay, it["small"], it.get("y", 360), it.get("size", 30), a * .85, col, sp=6)
 
+def punch_beats(spec):
+    """camera punches: "punch": "drop" = every beat from the drop until the breakdown, or a list of beats"""
+    p = spec.get("punch")
+    if p == "drop": return [b for b in range(DROP_BEAT, len(GRID)) if GRID[b] < BREAK_T - .1]
+    return list(p or [])
+
+def punch_zoom(t, spec):
+    z = 1.0
+    for b in punch_beats(spec):
+        k = t - T(b)
+        if 0 <= k < .5: z = max(z, 1 + spec.get("punch_amount", .035) * math.exp(-k * 9))
+    return z
+
 def frame(t, spec, LEN):
     lay = Image.new("RGBA", (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
     gl = Image.new("RGBA", (W, H), (0, 0, 0, 0)); g = ImageDraw.Draw(gl)
@@ -605,9 +629,16 @@ def frame(t, spec, LEN):
         a = win(t, t0, t1, fi=s.get("fade_in", .03), fo=s.get("fade_out", .12)) if t0 > 0 else cl((t1 - t) / s.get("fade_out", .12))
         if a > 0: SHOTS[s["type"]](t, d, g, a, s)
     draw_text(t, d, g, spec, LEN)
+    cq = spec.get("comment_q")
+    if cq and t >= T(cq["from"]):
+        k = t - T(cq["from"]); sc_ = 1 + .25 * math.exp(-k * 12)
+        big(d, cq["text"], cq.get("y", 560), int(cq.get("size", 52) * sc_), ease(k / .15), maxw=780)
     lay.alpha_composite(gl)
     glow = lay.resize((W // 2, H // 2)).filter(ImageFilter.GaussianBlur(9)).resize((W, H))
     im = BG.convert("RGBA"); im.alpha_composite(glow); im.alpha_composite(glow); im.alpha_composite(lay)
+    z = punch_zoom(t, spec)
+    if z > 1.0005:
+        w2, h2 = int(W * z), int(H * z); im = im.resize((w2, h2), Image.BILINEAR).crop(((w2 - W) // 2, (h2 - H) // 2, (w2 - W) // 2 + W, (h2 - H) // 2 + H))
     gr = GRAIN[int(t * FPS) % 6]
     return Image.blend(im.convert("RGB"), Image.merge("RGB", (gr, gr, gr)), 0.03)
 
@@ -646,6 +677,7 @@ def voice_track(spec, LEN, out_wav):
 
 def main():
     spec = json.load(open(sys.argv[1])); out = sys.argv[2]; LEN = float(spec.get("length", 44.5))
+    if spec.get("sound"): load_sound(spec["sound"])
     for s in spec["shots"]:
         if s["type"] not in SHOTS: sys.exit(f"unknown shot type {s['type']}; use one of {sorted(SHOTS)}")
     if len(sys.argv) > 4 and sys.argv[3] == "--preview":

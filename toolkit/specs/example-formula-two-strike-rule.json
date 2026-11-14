@@ -1,0 +1,290 @@
+{
+ "title": "The two strike rule (formula v1)",
+ "chapter": "Say It Until It's True",
+ "length": 45.0,
+ "sound": "vyzee",
+ "hook_type": "claim",
+ "punch": "drop",
+ "lines": [
+  {
+   "at": 0.12,
+   "text": "One doubt, and your belief falls over."
+  },
+  {
+   "beat": 4.5,
+   "text": "Here's the two strike rule."
+  },
+  {
+   "beat": 8,
+   "text": "You said it once. And left it there."
+  },
+  {
+   "beat": 12.5,
+   "text": "Said once, it just sits on the surface."
+  },
+  {
+   "beat": 17,
+   "text": "Then one doubt hits."
+  },
+  {
+   "beat": 20.5,
+   "text": "And it falls over. Again."
+  },
+  {
+   "beat": 23.6,
+   "text": "Belief isn't argued into you."
+  },
+  {
+   "beat": 27,
+   "text": "So how do you drive it in?"
+  },
+  {
+   "beat": 31,
+   "text": "One. Write it down."
+  },
+  {
+   "beat": 34,
+   "text": "Two. Say it when you wake."
+  },
+  {
+   "beat": 37,
+   "text": "Three. Say it before you sleep."
+  },
+  {
+   "beat": 40,
+   "text": "Four. Out loud. Mean it."
+  },
+  {
+   "beat": 43.5,
+   "text": "That's two strikes. Every day."
+  },
+  {
+   "beat": 47,
+   "text": "And say the strong version.",
+   "speed": 1.15
+  },
+  {
+   "beat": 49.5,
+   "text": "Not I'll try. I do.",
+   "speed": 1.15
+  },
+  {
+   "beat": 52,
+   "text": "Not someday. Today.",
+   "speed": 1.15
+  },
+  {
+   "beat": 54.5,
+   "text": "Not I hope. I will.",
+   "speed": 1.15
+  },
+  {
+   "beat": 57.5,
+   "text": "Two strikes is the floor."
+  },
+  {
+   "beat": 60.5,
+   "text": "Not the ceiling."
+  },
+  {
+   "beat": 62.5,
+   "text": "Flood your mind with it."
+  },
+  {
+   "beat": 67,
+   "text": "Belief isn't argued into you. It's trained.",
+   "speed": 1.1
+  },
+  {
+   "beat": 72,
+   "text": "Strike it twice. Every day."
+  },
+  {
+   "beat": 75.5,
+   "text": "Which do you skip? Morning or night?"
+  }
+ ],
+ "text": [
+  {
+   "from": 0,
+   "to": 4.5,
+   "big": "ONE DOUBT. YOUR BELIEF FALLS OVER.",
+   "size": 58
+  },
+  {
+   "from": 4.5,
+   "to": 8,
+   "big": "THE TWO STRIKE RULE",
+   "size": 66
+  },
+  {
+   "from": 8,
+   "to": 12.5,
+   "big": "YOU SAID IT ONCE.",
+   "size": 64
+  },
+  {
+   "from": 12.5,
+   "to": 17,
+   "big": "IT JUST SITS THERE.",
+   "size": 62
+  },
+  {
+   "from": 17,
+   "to": 20.5,
+   "big": "THEN ONE DOUBT HITS.",
+   "size": 62
+  },
+  {
+   "from": 20.5,
+   "to": 24,
+   "big": "IT FALLS. AGAIN.",
+   "size": 66
+  },
+  {
+   "from": 24,
+   "to": 27,
+   "big": "BELIEF ISN'T ARGUED INTO YOU.",
+   "size": 56
+  },
+  {
+   "from": 27,
+   "to": {
+    "t": 16.4
+   },
+   "big": "HOW DO YOU DRIVE IT IN?",
+   "size": 60
+  },
+  {
+   "from": 47,
+   "to": 57.5,
+   "small": "SAY THE STRONG VERSION",
+   "y": 240,
+   "size": 30
+  },
+  {
+   "from": 57.5,
+   "to": 60.5,
+   "big": "TWO STRIKES IS THE FLOOR.",
+   "size": 58
+  },
+  {
+   "from": 60.5,
+   "to": 62.5,
+   "big": "NOT THE CEILING.",
+   "size": 64
+  },
+  {
+   "from": 62.5,
+   "to": {
+    "t": 36.8
+   },
+   "big": "FLOOD YOUR MIND WITH IT.",
+   "size": 58
+  },
+  {
+   "from": 67,
+   "to": 69.5,
+   "big": "BELIEF ISN'T ARGUED.",
+   "size": 60
+  },
+  {
+   "from": 69.5,
+   "to": 71.8,
+   "big": "IT'S TRAINED.",
+   "size": 76
+  },
+  {
+   "from": 72,
+   "big": "STRIKE IT TWICE.",
+   "size": 84,
+   "gold": true
+  }
+ ],
+ "comment_q": {
+  "from": 75.5,
+  "text": "WHICH DO YOU SKIP? MORNING OR NIGHT?"
+ },
+ "shots": [
+  {
+   "type": "nail",
+   "from": 0,
+   "by": 1180,
+   "label": "I CAN DO THIS",
+   "tip": 21,
+   "stand": 31,
+   "strikes": [
+    31,
+    34,
+    37,
+    40
+   ],
+   "taps": [
+    47,
+    49.5,
+    52,
+    54.5,
+    57.5,
+    58.5,
+    59.5,
+    60.5,
+    61.5,
+    62.5,
+    63.5,
+    64.5,
+    65.5
+   ],
+   "gold": 72
+  },
+  {
+   "type": "numbered",
+   "from": 31,
+   "to": 46.9,
+   "title": "THE TWO STRIKE RULE",
+   "y": 420,
+   "gap": 125,
+   "items": [
+    {
+     "text": "WRITE IT DOWN",
+     "beat": 31
+    },
+    {
+     "text": "SAY IT WHEN YOU WAKE",
+     "beat": 34
+    },
+    {
+     "text": "SAY IT BEFORE YOU SLEEP",
+     "beat": 37
+    },
+    {
+     "text": "OUT LOUD. MEAN IT.",
+     "beat": 40
+    }
+   ]
+  },
+  {
+   "type": "convert",
+   "from": 47,
+   "to": 56.9,
+   "y": 420,
+   "gap": 130,
+   "rows": [
+    {
+     "a": "I'LL TRY",
+     "b": "I DO",
+     "beat": 49.5
+    },
+    {
+     "a": "SOMEDAY",
+     "b": "TODAY",
+     "beat": 52
+    },
+    {
+     "a": "I HOPE",
+     "b": "I WILL",
+     "beat": 54.5
+    }
+   ]
+  }
+ ]
+}

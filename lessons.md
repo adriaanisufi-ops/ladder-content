@@ -1,5 +1,11 @@
 # Lessons (keep adding, newest at the top)
 
+## THE FORMULA from 2026-11-14 (Adriaan: "make a formula and a way to really make this happen"), read FORMULA.md first
+- FORMULA.md is binding on top of the VYZEE section below: hook max 8 words done by 2.3 s, a promise in the first 5 s ("Here's the two strike rule."), something new on screen at least every 2.5 s, "punch": "drop", numbered steps of max 5 words with the full list held 3 s+, examples, gold, and a one word comment question at the end ("comment_q", spoken too).
+- Before rendering: python3 toolkit/score.py SPEC.json. Below 80: fix, don't render. Example at 100/100: toolkit/specs/example-formula-two-strike-rule.json.
+- Music (Adriaan 2026-11-14): rotate trending sounds. He sends 2 or 3 per week; measure with toolkit/beatmap.py into toolkit/sounds/<name>.json and set "sound" in the spec. Until new sounds come in, use "vyzee". In the message, name the sound per video.
+- Measurement: ask Adriaan for the TikTok Studio stats after 48 h, log them in results.csv, review every Sunday (hook_type, sound, metaphor).
+
 ## DEFAULT FORMAT from 2026-11-13: VYZEE explainers (Adriaan: "this is good, make this kind of stuff always")
 Approved video: "Price Tags" (spec: toolkit/specs/example-vyzee-price-tags.json). Replaces the ladder dialog below.
 - Look: minimal glowing white line animation on black (little figure, shop window, tags, receipts, stairs, big glowing words, white pills), ONE gold moment at the end. Style reference: Adriaan's "Or we could go up" video.
