@@ -589,6 +589,188 @@ def shot_house(t, d, g, a, s):
         while spaced_w(d, v["text"], font(sz), 3) > 440 and sz > 22: sz -= 2
         text_c(d, v["text"], y - sz / 2, sz, al_ * .9, sp=3, cx=x if p_in < 1 else cx)
 
+def shot_replay(t, d, g, a, s):
+    """a rehearsal on a loop: a circular arrow spins faster and faster around a counter that counts up (TIMES FELT),
+    while the real event is a small circle that has happened 0 times. At 'cut' the loop snaps open and stops.
+    keys: cy, r, count [from, to, max], label, cut, real {beat, y, r, label}, gold (the real circle turns gold), dim"""
+    cx, cy, R = 540, s.get("cy", 900), s.get("r", 230)
+    c0, c1, mx = s.get("count", [0, 20, 40]); tc0, tc1 = T(c0), T(c1)
+    cut = T(s["cut"]) if "cut" in s else None
+    tt = min(t, cut) if cut is not None and t >= cut else t
+    p = cl((tt - tc0) / max(.1, tc1 - tc0)); n = max(1, int(round(1 + (mx - 1) * p ** 1.5)))
+    ang = math.degrees(tt * 1.6 + 7 * p * p * (tc1 - tc0) / 4)
+    k = ease((t - cut) / .5) if cut is not None and t >= cut else 0.0
+    dim = 1 - s.get("dim", .45) * k
+    gap = 40 + 110 * k; st = ang + gap / 2; en = ang + 360 - gap / 2
+    c = WHITE + (int(235 * a * dim),); off = 26 * k
+    box = [cx - R, cy - R + off, cx + R, cy + R + off]
+    d.arc(box, st, en, fill=c, width=max(4, int(R * .045)))
+    e = math.radians(en); hx, hy = cx + math.cos(e) * R, cy + off + math.sin(e) * R
+    tx, ty = -math.sin(e), math.cos(e); nx, ny = math.cos(e), math.sin(e); hs = R * .12
+    if k < .5:
+        d.polygon([(hx + tx * hs, hy + ty * hs), (hx - tx * hs * .3 + nx * hs * .7, hy - ty * hs * .3 + ny * hs * .7),
+                   (hx - tx * hs * .3 - nx * hs * .7, hy - ty * hs * .3 - ny * hs * .7)], fill=c)
+    if cut is not None and 0 <= t - cut < .45:
+        q = (t - cut) / .45; m = math.radians(ang)
+        for j in range(7):
+            an = m + (j - 3) * .45; r0, r1 = R + 10 + 40 * q, R + 40 + 120 * q
+            d.line([cx + math.cos(an) * r0, cy + math.sin(an) * r0, cx + math.cos(an) * r1, cy + math.sin(an) * r1], fill=WHITE + (int(220 * a * (1 - q)),), width=4)
+    sz = int(R * .62); text_c(d, str(n), cy + off - sz * .62, sz, a * dim, sp=2)
+    if s.get("label"): text_c(d, s["label"], cy + off + R * .36, max(18, int(R * .1)), a * .75 * dim, sp=5)
+    rl = s.get("real")
+    if rl and t >= T(rl["beat"]):
+        q = t - T(rl["beat"]); rr = rl.get("r", 46) * (1 + .3 * math.exp(-q * 12)); ry = rl.get("y", cy + R + 130)
+        gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+        al = a * ease(q / .15)
+        d.ellipse([cx - rr, ry - rr, cx + rr, ry + rr], outline=WHITE + (int(235 * al * (1 - gold)),), width=5)
+        if gold > 0:
+            g.ellipse([cx - rr, ry - rr, cx + rr, ry + rr], fill=GOLD + (int(255 * al * gold),))
+        if rl.get("label"): text_c(g if gold > .5 else d, rl["label"], ry + rr + 18, 26, al * .9, col=GOLD if gold > .5 else WHITE, sp=4)
+
+def link(d, x, y, w, h, a, side=False, col=WHITE, thin=False):
+    c = col + (int(235 * a),)
+    if side: d.rounded_rectangle([x - w / 2, y - h * .16, x + w / 2, y + h * .16], radius=int(h * .16), outline=c, width=3 if thin else 6)
+    else: d.rounded_rectangle([x - w / 2, y - h / 2, x + w / 2, y + h / 2], radius=int(h / 2), outline=c, width=3 if thin else 6)
+
+def shot_chain(t, d, g, a, s):
+    """a streak as a chain between two posts: one link per day. A skipped day is a dashed empty link (gap beat); at 'break'
+    the whole chain falls (DAY 0); at 'fix' it comes back and the smallest, thin link fills the gap.
+    keys: links [{beat, gap (beat the dashed hole shows), small}], break, fix, cy, scale, counter ("DAY"), gold"""
+    sc = s.get("scale", 1.0); cy = s.get("cy", 900); L = s["links"]; n = len(L)
+    sp = 70 * sc; lw, lh = 100 * sc, 54 * sc; x0 = 540 - sp * (n - 1) / 2
+    br = T(s["break"]) if "break" in s else None; fx = T(s["fix"]) if "fix" in s else None
+    falling = br is not None and t >= br and (fx is None or t < fx)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    pc = WHITE + (int(200 * a),)
+    for px in (x0 - sp * .95, x0 + sp * (n - 1) + sp * .95):
+        d.line([px, cy - 80 * sc, px, cy + 160 * sc], fill=pc, width=6); d.line([px - 30 * sc, cy + 160 * sc, px + 30 * sc, cy + 160 * sc], fill=pc, width=6)
+    for i, lk in enumerate(L):
+        x = x0 + i * sp; side = i % 2 == 1
+        if "gap" in lk and t >= T(lk["gap"]) and t < T(lk["beat"]) and not falling:
+            bl = .55 + .45 * math.sin(t * 9)
+            for j in range(10):
+                an = j / 10 * 2 * math.pi; an2 = an + .3
+                d.line([x + math.cos(an) * lw * .48, cy + math.sin(an) * lh * .5, x + math.cos(an2) * lw * .48, cy + math.sin(an2) * lh * .5], fill=WHITE + (int(200 * a * bl),), width=3)
+            continue
+        if t < T(lk["beat"]): continue
+        if br is not None and T(lk["beat"]) > br and fx is not None and T(lk["beat"]) < fx: continue
+        q = t - T(lk["beat"]); al = a if T(lk["beat"]) <= 0 else a * ease(q / .12); pop = 1 + (.3 * math.exp(-q * 14) if T(lk["beat"]) > 0 else 0)
+        y = cy
+        if falling:
+            k = max(0.0, t - br - abs(i - n / 2) * .03); y += min(900, 1400 * k * k); al *= cl(1 - k / .9)
+        thin = lk.get("small", False)
+        ww, hh = lw * pop * (.8 if thin else 1), lh * pop * (.8 if thin else 1)
+        if gold < 1: link(d, x, y, ww, hh, al * (1 - gold), side, thin=thin)
+        if gold > 0: link(g, x, y, ww, hh, al * gold, side, col=GOLD, thin=thin)
+    if s.get("counter"):
+        cnt = 0 if falling else sum(1 for lk in L if t >= T(lk["beat"]) and not (br is not None and fx is not None and br < T(lk["beat"]) < fx))
+        lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+        text_c(lay, f"{s['counter']} {cnt}", cy - 170 * sc, int(54 * sc), a, col=col, sp=6)
+
+def barbell(d, x, y, s, a, col=WHITE):
+    c = col + (int(240 * a),)
+    d.line([x - 95 * s, y, x + 95 * s, y], fill=c, width=max(3, int(6 * s)))
+    for sx in (-1, 1):
+        d.rounded_rectangle([x + sx * 80 * s - 8 * s, y - 30 * s, x + sx * 80 * s + 8 * s, y + 30 * s], radius=int(4 * s), outline=c, width=max(3, int(5 * s)))
+
+def shot_room(t, d, g, a, s):
+    """the room nobody's grading: a figure training (the bar goes overhead on every rep beat) under a spotlight while an
+    audience watches; the audience leaves at crowd[1], the light goes out at light[1], the bar goes down at 'down'.
+    keys: base, scale, crowd [in, out], light [on, off], reps [beats], down, walls, gold"""
+    base = s.get("base", 1150); sc = s.get("scale", 1.5); cx = 540; top = base - 560
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    if s.get("walls", True):
+        c = WHITE + (int(150 * a),)
+        d.line([190, top, 190, base], fill=c, width=3); d.line([890, top, 890, base], fill=c, width=3)
+        d.line([190, top, 890, top], fill=WHITE + (int(70 * a),), width=2)
+    d.line([150, base, 930, base], fill=WHITE + (int(190 * a),), width=4)
+    if "light" in s:
+        on, off = s["light"]; li = ease((t - T(on)) / .2) * (1 - ease((t - T(off)) / .35)) if t >= T(on) else 0
+        if li > 0:
+            d.polygon([(495, top), (585, top), (720, base), (360, base)], fill=WHITE + (int(34 * a * li),))
+            d.ellipse([360, base - 22, 720, base + 22], fill=WHITE + (int(50 * a * li),))
+    if "crowd" in s:
+        ci, co = s["crowd"]
+        for r, (yy, nn) in enumerate(((base + 85, 7), (base + 160, 8))):
+            for j in range(nn):
+                x = 220 + j * (640 / (nn - 1)) + (0 if r == 0 else 0); k = r * 7 + j
+                al = cl((t - T(ci) - k * .03) / .12) * (1 - cl((t - T(co) - k * .07) / .25)); dy = 30 * cl((t - T(co) - k * .07) / .25)
+                if al <= .01: continue
+                cc = WHITE + (int(150 * a * al),)
+                d.ellipse([x - 17, yy - 40 + dy, x + 17, yy - 6 + dy], outline=cc, width=3)
+                d.arc([x - 30, yy + dy, x + 30, yy + 50 + dy], 180, 360, fill=cc, width=3)
+    reps = [T(b) for b in s.get("reps", [])]; last = max([r for r in reps if r <= t], default=None)
+    lift = 0.0
+    if last is not None:
+        q = t - last; lift = ease(q / .16) if q < .3 else 1 - ease((q - .3) / .28)
+    down = T(s["down"]) if "down" in s else None
+    on_floor = down is not None and t >= down and (last is None or last < down)
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        person(lay, cx, base, al, sc, col)
+        if on_floor:
+            barbell(lay, cx + 170, base - 30 * sc * .8, sc * .8, al, col)
+        else:
+            by = base - 50 * sc - lift * 75 * sc
+            barbell(lay, cx, by, sc, al, col)
+            for sx in (-1, 1): lay.line([cx + sx * 20 * sc, base - 46 * sc, cx + sx * 50 * sc, by], fill=col + (int(240 * al),), width=max(3, int(6 * sc)))
+
+def shot_seed(t, d, g, a, s):
+    """a goal is a seed in a pot: every water drop (beat) makes it grow, every dig (beat) yanks the seed out of the soil
+    to check it and kills the growth. keys: waters [beats], digs [beats], start (growth before the first dig), inc (per drop),
+    cy (soil y), scale, hold (seconds the seed stays up), gold (a gold flower)"""
+    sc = s.get("scale", 1.0); cx, cy = 540, s.get("cy", 1000); inc = s.get("inc", .2); hold = s.get("hold", .9)
+    waters = [T(b) for b in s.get("waters", [])]; digs = [T(b) for b in s.get("digs", [])]
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    def growth(at, since):
+        gr = s.get("start", 0.0) if since is None else 0.0
+        for w in waters:
+            if (since is None or w >= since) and at >= w + .3: gr += inc * ease((at - w - .3) / .4)
+        return min(1.0, gr)
+    ld = max([x for x in digs if x <= t], default=None)
+    lift = 0.0; gr = growth(t, ld)
+    if ld is not None and t - ld < hold + .5:
+        q = t - ld; prev_ld = max([x for x in digs if x < ld], default=None)
+        gprev = growth(ld, prev_ld)
+        lift = ease(q / .2) if q < hold else 1 - ease((q - hold) / .3)
+        if q < hold: gr = gprev * (1 - ease(q / .15))
+    c = WHITE + (int(235 * a),)
+    pw, pb, ph = 210 * sc, 150 * sc, 220 * sc
+    d.line([cx - pw, cy, cx + pw, cy], fill=c, width=6)
+    d.line([(cx - pw, cy), (cx - pb, cy + ph), (cx + pb, cy + ph), (cx + pw, cy)], fill=c, width=5, joint="curve")
+    sy = cy + 85 * sc - lift * 230 * sc
+    lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+    if gr > .01:
+        hgt = 40 * sc + gr * 440 * sc; pts = []
+        for i in range(13):
+            f = i / 12; pts.append((cx + math.sin(t * 1.4 + f * 2) * 8 * gr * f, sy - 10 * sc - f * hgt))
+        lay.line(pts, fill=col + (int(240 * a),), width=max(3, int(6 * sc)), joint="curve")
+        for k in range(int(gr * 6)):
+            f = (k + 1) / 7; bx, byy = pts[int(f * 12)]; sd = 1 if k % 2 else -1; L_ = 84 * sc
+            lp = [(bx, byy), (bx + sd * L_ * .45, byy - L_ * .42), (bx + sd * L_, byy - L_ * .22), (bx + sd * L_ * .55, byy + L_ * .1)]
+            lay.polygon(lp, fill=col + (int(60 * a),)); lay.line(lp + [lp[0]], fill=col + (int(235 * a),), width=max(3, int(5 * sc)), joint="curve")
+        if gold > 0:
+            tx, ty = pts[-1]
+            for j in range(6):
+                an = j / 6 * 2 * math.pi + t * .3; px, py = tx + math.cos(an) * 30 * sc * gold, ty + math.sin(an) * 30 * sc * gold
+                g.ellipse([px - 20 * sc, py - 20 * sc, px + 20 * sc, py + 20 * sc], fill=GOLD + (int(255 * a * gold),))
+            g.ellipse([tx - 16 * sc, ty - 16 * sc, tx + 16 * sc, ty + 16 * sc], fill=INK + (int(255 * a * gold),))
+    lay.ellipse([cx - 24 * sc, sy - 15 * sc, cx + 24 * sc, sy + 15 * sc], fill=col + (int(245 * a),))
+    if ld is not None and 0 <= t - ld < .5:
+        q = (t - ld) / .5
+        for j in range(9):
+            an = math.pi + (j + .5) * math.pi / 9; rr = 30 + 170 * q * sc
+            d.ellipse([cx + math.cos(an) * rr - 5, cy + math.sin(an) * rr * .7 - 5, cx + math.cos(an) * rr + 5, cy + math.sin(an) * rr * .7 + 5], fill=WHITE + (int(220 * a * (1 - q)),))
+    if lift > .8: text_c(d, "?", sy - 140 * sc, int(80 * sc), a * cl((lift - .8) / .2))
+    for w in waters:
+        q = t - w
+        if 0 <= q < .3:
+            y = cy - 560 * sc + q / .3 * (560 * sc - 20); r = 16 * sc
+            d.ellipse([cx - r, y - r, cx + r, y + r], fill=WHITE + (int(240 * a),)); d.polygon([(cx - r * .9, y - r * .4), (cx + r * .9, y - r * .4), (cx, y - r * 2.6)], fill=WHITE + (int(240 * a),))
+        elif .3 <= q < .65:
+            k = (q - .3) / .35; rr = 20 + 90 * k * sc
+            d.ellipse([cx - rr, cy - rr * .3, cx + rr, cy + rr * .3], outline=WHITE + (int(200 * a * (1 - k)),), width=3)
+
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
 
 # ---------------------------------------------------------------- render
