@@ -9,6 +9,8 @@ loud part until the breakdown at 36.8 s, quiet part after that (second drop at 4
 
 Usage:  python3 toolkit/vyzee.py SPEC.json OUT.mp4 [--preview 0.03,17.3,40]
 Example spec: toolkit/specs/example-vyzee-price-tags.json (the approved video).
+New on 2026-11-16: ghost (the gap: you vs the idea of you running ahead), blueprint (the manual nobody handed you,
+drawn rung by rung), puzzle (a jigsaw piece sanding off its own edges), doors (resistance: START door to push, STOP door to hold).
 
 Spec:
   length      seconds (about 40 to 45)
@@ -770,6 +772,172 @@ def shot_seed(t, d, g, a, s):
         elif .3 <= q < .65:
             k = (q - .3) / .35; rr = 20 + 90 * k * sc
             d.ellipse([cx - rr, cy - rr * .3, cx + rr, cy + rr * .3], outline=WHITE + (int(200 * a * (1 - k)),), width=3)
+
+def person_outline(d, x, yf, a=1.0, s=1.0, col=WHITE):
+    if a <= 0.01: return
+    c = col + (int(255 * a),); w = max(2, int(4 * s))
+    d.ellipse([x - 17 * s, yf - 92 * s, x + 17 * s, yf - 58 * s], outline=c, width=w)
+    d.rounded_rectangle([x - 22 * s, yf - 52 * s, x + 22 * s, yf], radius=int(16 * s), outline=c, width=w)
+
+def shot_ghost(t, d, g, a, s):
+    """the gap: you (solid figure) and the version of you that only exists as an idea (an outline ghost) running ahead on
+    the same ground; a bracket between you is the gap. keys: you (start x), ghost [[beat, x], ...] keyframes,
+    ages [{beat, text}] (small label over the ghost), fade (beat the ghost fades), walk [beats] (you take one real step,
+    leaving a footprint), step (px per step), scale, label (bracket text), gold, base (ground y)"""
+    base = s.get("base", GROUND); step = s.get("step", 60); sc = s.get("scale", 1.0)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    d.line([140, base, 940, base], fill=WHITE + (int(160 * a),), width=3)
+    walks = [T(b) for b in s.get("walk", [])]
+    yx = s.get("you", 260) + sum(step * ease((t - w) / .35) for w in walks)
+    for i, w in enumerate(walks):
+        if t >= w + .3:
+            fx = s.get("you", 260) + step * i + 10
+            lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+            lay.rounded_rectangle([fx - 10, base + 12, fx + 10, base + 18], radius=3, fill=col + (int(200 * a),))
+    kf = s.get("ghost", [[0, 560]]); xs = [T(k[0]) for k in kf]
+    gx = kf[0][1]
+    for (b0, x0), (b1, x1) in zip(kf, kf[1:]):
+        if t >= T(b0): gx = x0 + (x1 - x0) * ease((t - T(b0)) / max(.1, T(b1) - T(b0)))
+    gf = 1 - ease((t - T(s["fade"])) / .5) if "fade" in s else 1.0
+    moving = any(T(b0) <= t < T(b1) and x0 != x1 for (b0, x0), (b1, x1) in zip(kf, kf[1:]))
+    bob = abs(math.sin(t * 11)) * 10 if moving else 0
+    if gf > .01:
+        person_outline(d, gx, base - bob, a * .7 * gf, sc)
+        cur = [x for x in s.get("ages", []) if t >= T(x["beat"])]
+        if cur:
+            lw = spaced_w(d, cur[-1]["text"], font(26), 4); lx = min(max(gx, 150 + lw / 2), 930 - lw / 2)
+            text_c(d, cur[-1]["text"], base - 150 * sc, 26, a * .8 * gf * ease((t - T(cur[-1]["beat"])) / .15), cx=lx, sp=4)
+        x0, x1, by = yx + 40 * sc, gx - 40 * sc, base - 60 * sc
+        if x1 - x0 > 30:
+            c = WHITE + (int(200 * a * gf),)
+            d.line([x0, by, x1, by], fill=c, width=3)
+            for xx in (x0, x1): d.line([xx, by - 14, xx, by + 14], fill=c, width=3)
+            if x1 - x0 > 170: text_c(d, s.get("label", "THE GAP"), by - 50, 28, a * gf, cx=(x0 + x1) / 2, sp=6)
+    person(d, yx, base, a * (1 - gold), sc); person(g, yx, base, a * gold, sc, col=GOLD)
+
+def shot_blueprint(t, d, g, a, s):
+    """the blueprint nobody handed you: a grid sheet with a faint dashed ladder and a '?'; on every rung beat one rung is
+    drawn for real (you build it yourself), gold on 'gold'. keys: box [x0, y0, x1, y1], rungs [beats] (max 9),
+    wait [from, to] (a WAITING counter counts the years), years (max), figure x (a figure waits on the ground), gold"""
+    x0, y0, x1, y1 = s.get("box", [300, 560, 860, 1060]); w, h = x1 - x0, y1 - y0
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    c = WHITE + (int(210 * a),)
+    d.rounded_rectangle([x0, y0, x1, y1], radius=10, outline=c, width=4)
+    for i in range(1, 8):
+        xx = x0 + w * i / 8; d.line([xx, y0 + 6, xx, y1 - 6], fill=WHITE + (int(28 * a),), width=1)
+        yy = y0 + h * i / 8; d.line([x0 + 6, yy, x1 - 6, yy], fill=WHITE + (int(28 * a),), width=1)
+    ra, rb, top, bot = x0 + w * .33, x0 + w * .67, y0 + h * .08, y1 - h * .06
+    rungs = [T(b) for b in s.get("rungs", [])]; n = 9
+    built = [r for r in rungs if t >= r]
+    rail = cl(len(built) / 2)
+    for xx in (ra, rb):
+        for k in range(0, int(bot - top), 26):
+            d.line([xx, top + k, xx, min(bot, top + k + 12)], fill=WHITE + (int(70 * a * (1 - rail)),), width=3)
+    if built:
+        fr = ease((t - built[0]) / .4); yb = bot - (bot - top) * fr
+        for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+            if al <= .01: continue
+            for xx in (ra, rb): lay.line([xx, bot, xx, yb], fill=col + (int(240 * al),), width=6)
+            for i, r in enumerate(built[:n]):
+                y = bot - (bot - top) * (i + .5) / n; q = ease((t - r) / .2)
+                sc_ = 1 + .4 * math.exp(-(t - r) * 12) if lay is d else 1
+                lay.line([ra, y, ra + (rb - ra) * q, y], fill=col + (int(240 * al),), width=int(6 * sc_))
+    else:
+        text_c(d, "?", y0 + h / 2 - 90, 150, a * (.45 + .2 * math.sin(t * 3)))
+    if "wait" in s:
+        wf, wt = s["wait"]; q = cl((t - T(wf)) / max(.1, T(wt) - T(wf)))
+        if t >= T(wf): text_c(d, f"WAITING: {max(1, int(q * s.get('years', 12)))} YEARS", s.get("wait_y", y1 + 40), 30, a * .85, sp=5)
+    if "figure" in s:
+        ground(d, a); person(d, s["figure"], GROUND, a * (1 - gold)); person(g, s["figure"], GROUND, a * gold, col=GOLD)
+
+def _piece(cx, cy, L, tabs, r):
+    """outline points of a jigsaw piece; tabs = 4 sizes (top, right, bottom, left), 1 = knob out, -1 = hole in, 0 = flat"""
+    h = L / 2; corners = [(cx - h, cy - h), (cx + h, cy - h), (cx + h, cy + h), (cx - h, cy + h)]
+    pts = []
+    for i in range(4):
+        A, B = corners[i], corners[(i + 1) % 4]; ux, uy = (B[0] - A[0]) / L, (B[1] - A[1]) / L; nx, ny = uy, -ux
+        k = tabs[i]; pts.append(A)
+        if abs(k) > .02:
+            R = r * abs(k); sg = 1 if k > 0 else -1; mx, my = (A[0] + B[0]) / 2, (A[1] + B[1]) / 2
+            for j in range(25):
+                th = math.radians(-131.4 - 277.2 * j / 24)
+                lx, ly = R * math.cos(th), .75 * R + R * math.sin(th)
+                pts.append((mx + ux * lx + nx * ly * sg, my + uy * lx + ny * ly * sg))
+    return pts
+
+def shot_puzzle(t, d, g, a, s):
+    """you as a jigsaw piece sanding off your own edges to fit anywhere: on every sand beat one knob is filed flat (dust,
+    its label floats up and fades); on every grow beat a knob comes back; at 'gold' the piece lights gold and the
+    picture it belongs in appears around it. keys: cx, cy, L, r, labels [4] (top, right, bottom, left), sand [4 beats],
+    grow [4 beats], label_y, gold"""
+    cx, cy, L = s.get("cx", 540), s.get("cy", 800), s.get("L", 360); r = s.get("r", L * .16)
+    sand = [T(b) for b in s.get("sand", [])]; grow = [T(b) for b in s.get("grow", [])]
+    tabs = []
+    for i in range(4):
+        k = 1.0
+        if i < len(sand) and t >= sand[i]: k = 1 - ease((t - sand[i]) / .35)
+        if i < len(grow) and t >= grow[i]: k = ease((t - grow[i]) / .3) * (1 + .15 * math.exp(-(t - grow[i]) * 8))
+        tabs.append(k)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    if gold > 0:
+        for dx, dy, side in ((-L, 0, 1), (L, 0, 3), (0, -L, 2), (0, L, 0)):
+            nt = [0, 0, 0, 0]; nt[side] = -1
+            np_ = _piece(cx + dx, cy + dy, L, nt, r); g.line(np_ + [np_[0]], fill=GOLD + (int(110 * a * gold),), width=3)
+    pts = _piece(cx, cy, L, tabs, r)
+    if gold > 0: g.polygon(pts, fill=GOLD + (int(70 * a * gold),))
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al > .01: lay.line(pts + [pts[0]], fill=col + (int(240 * al),), width=5, joint="curve")
+    labels = s.get("labels", [])
+    centers = [(cx, cy - L / 2), (cx + L / 2, cy), (cx, cy + L / 2), (cx - L / 2, cy)]
+    for i, b in enumerate(sand):
+        q = t - b
+        if 0 <= q < .6:
+            ox, oy = centers[i]
+            for j, (ang, spd) in enumerate(PARTS[:14]):
+                rr = 20 + spd * .35 * ease(q / .6); x, y = ox + math.cos(ang) * rr, oy + math.sin(ang) * rr + 80 * q * q
+                d.ellipse([x - 4, y - 4, x + 4, y + 4], fill=WHITE + (int(220 * a * (1 - q / .6)),))
+        if i < len(labels) and 0 <= q < 1.6:
+            al = a * ease(q / .15) * cl((1.6 - q) / .4)
+            text_c(d, labels[i], s.get("label_y", cy + L / 2 + r * 2 + 50) - 40 * ease(q / 1.6), 40, al, sp=6)
+
+def door(d, x0, x1, top, base, op, a, col=WHITE, light=0.0):
+    """a door frame with a panel hinged on the left; op 0 = shut, 1 = wide open; light = glow through the opening"""
+    if a <= .01: return
+    c = col + (int(230 * a),); w = x1 - x0
+    if light > 0 and op > .02: d.rectangle([x0 + 4, top + 4, x1 - 4, base - 4], fill=WHITE + (int(70 * a * light * op),))
+    ang = op * math.radians(78); pw = w * math.cos(ang); sk = 40 * math.sin(ang)
+    panel = [(x0, top), (x0 + pw, top - sk), (x0 + pw, base + sk * .3), (x0, base)]
+    d.polygon(panel, fill=INK + (int(255 * a),)); d.line(panel + [panel[0]], fill=c, width=4, joint="curve")
+    kx = x0 + pw * .82; ky = (top + base) / 2
+    d.ellipse([kx - 8, ky - 8, kx + 8, ky + 8], fill=c)
+    d.line([x0 - 10, top - 10, x1 + 10, top - 10], fill=c, width=5)
+    d.line([x0 - 10, top - 10, x0 - 10, base], fill=c, width=4); d.line([x1 + 10, top - 10, x1 + 10, base], fill=c, width=4)
+
+def shot_doors(t, d, g, a, s):
+    """resistance, same muscle in two directions: the left door (START) is heavy and shut, it rattles on 'shake' beats and
+    opens a bit on every 'push' beat; the right door (STOP) swings open by itself on 'lure' with light pouring out and pulls
+    the figure toward it, every 'hold' beat pushes it further shut. keys: base, top, push, shake, lure, hold, labels, gold"""
+    base, top = s.get("base", 1320), s.get("top", 900)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    pushes = [T(b) for b in s.get("push", [])]; holds = [T(b) for b in s.get("hold", [])]
+    lop = min(.95, sum(.25 * ease((t - p) / .3) for p in pushes))
+    sh = sum(math.sin((t - b) * 60) * 6 * math.exp(-(t - b) * 6) for b in (T(x) for x in s.get("shake", [])) if t >= b)
+    lure = ease((t - T(s["lure"])) / .8) * .7 if "lure" in s else 0
+    rop = max(0.0, lure - sum(.25 * ease((t - h) / .25) for h in holds))
+    labels = s.get("labels", ["START", "STOP"])
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        door(lay, 210 + sh, 430 + sh, top, base, lop, al, col, light=.6)
+        door(lay, 650, 870, top, base, rop, al, col, light=1.0 + .3 * math.sin(t * 5))
+        lay.line([150, base, 930, base], fill=col + (int(170 * al),), width=3)
+        text_c(lay, labels[0], top - 70, 32, al, col=col, cx=320, sp=8); text_c(lay, labels[1], top - 70, 32, al, col=col, cx=760, sp=8)
+    pull = rop * 50 * (1 + .15 * math.sin(t * 7))
+    for k in pushes:
+        q = t - k
+        if 0 <= q < .5: pull -= 40 * math.sin(q / .5 * math.pi)
+    px = 540 + pull
+    person(d, px, base, a * (1 - gold)); person(g, px, base, a * gold, col=GOLD)
+
 
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
 
