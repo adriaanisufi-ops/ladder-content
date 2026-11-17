@@ -1025,7 +1025,7 @@ def shot_pulse(t, d, g, a, s):
 def shot_pillars(t, d, g, a, s):
     """the fifth statement: a beam on pillars (labels) that stand on nothing and shake; on every 'ground' beat one block of
     the ground slides in under them, when it is complete the shaking stops; gold on 'gold'. keys: labels [{text, beat}],
-    shake [from, to] (beats), ground [beats], ground_label, base, top, gold"""
+    shake [from, to] (beats), shake_amp (px, default 7), shake_speed (default 23), ground [beats], ground_label, base, top, gold"""
     base, top = s.get("base", 1260), s.get("top", 960); labs = s.get("labels", [])
     gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
     gb = [T(b) for b in s.get("ground", [])]; built = sum(1 for b in gb if t >= b)
@@ -1033,7 +1033,7 @@ def shot_pillars(t, d, g, a, s):
     if "shake" in s:
         sf, st_ = T(s["shake"][0]), T(s["shake"][1])
         done = gb and t >= gb[-1]
-        if sf <= t < st_ and not done: sh = math.sin(t * 23) * 7 * (1 - built / max(1, len(gb)))
+        if sf <= t < st_ and not done: sh = math.sin(t * s.get("shake_speed", 23)) * s.get("shake_amp", 7) * (1 - built / max(1, len(gb)))
     n = max(1, len(labs)); x0, x1 = 190, 890; cw = (x1 - x0) / n
     for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
         if al <= .01: continue
