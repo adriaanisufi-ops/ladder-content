@@ -13,7 +13,8 @@ New on 2026-11-16: ghost (the gap: you vs the idea of you running ahead), bluepr
 drawn rung by rung), puzzle (a jigsaw piece sanding off its own edges), doors (resistance: START door to push, STOP door to hold).
 New on 2026-11-17: split (WHAT YOU SAY vs WHAT YOU DO drifting apart, caught back), pulse (heart monitor: one spike then a
 flatline, or a steady rhythm), pillars (four statements standing on nothing until the ground slides in), match (books
-stack up next to an unstruck match, then it is struck gold).
+stack up next to an unstruck match, then it is struck gold), backpack (a plan packed for who you wish you were
+collapses you; resized to what you can carry, you walk).
 
 Spec:
   length      seconds (about 40 to 45)
@@ -1102,6 +1103,51 @@ def shot_match(t, d, g, a, s):
             for j, (an, sp_) in enumerate(PARTS[:16]):
                 rr = sp_ * .5 * ease(k / .9); x, y = cx + math.cos(an) * rr, cy + math.sin(an) * rr * .7
                 g.ellipse([x - 5, y - 5, x + 5, y + 5], fill=GOLD + (int(255 * a * (1 - k / .9)),))
+
+def shot_backpack(t, d, g, a, s):
+    """build it the size you can carry: a figure with a backpack; every item (beat, text) drops into the pack and makes it
+    bigger and the figure sinks; at 'collapse' he goes down flat with the pack beside him; at 'resize' he stands up with a
+    small pack (small label) and takes one step per 'walk' beat, leaving footprints; gold on 'gold'.
+    keys: x (start), base, scale, items [{beat, text}], collapse, resize, small, walk [beats], step, gold"""
+    base = s.get("base", 1300); sc = s.get("scale", 1.5); x0 = s.get("x", 330); step = s.get("step", 55)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    items = s.get("items", []); got = [it for it in items if t >= T(it["beat"])]
+    col_t = T(s["collapse"]) if "collapse" in s else 1e9; res_t = T(s["resize"]) if "resize" in s else 1e9
+    walks = [T(b) for b in s.get("walk", [])]
+    px = x0 + sum(step * ease((t - w) / .35) for w in walks)
+    grow = sum(ease((t - T(it["beat"])) / .25) for it in got)
+    small = ease((t - res_t) / .4)
+    pw = (150 + 14 * grow) * (1 - small) + 64 * small; ph = (90 + 100 * grow) * (1 - small) + 74 * small
+    sink = min(28, 7 * grow) * (1 - small) if t < col_t else 0
+    down = ease((t - col_t) / .35) * (1 - ease((t - res_t) / .4))
+    ground(d, a)
+    for i, w in enumerate(walks):
+        if t >= w + .3:
+            fx = x0 + step * i + 14; lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+            lay.rounded_rectangle([fx - 10, base + 12, fx + 10, base + 18], radius=3, fill=col + (int(200 * a),))
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        c = col + (int(240 * al),)
+        if down > .02:
+            # lying flat, the pack dropped on the ground behind him
+            hx = px + 40 * sc * down; yy = base - 18 * sc
+            lay.ellipse([hx + 52 * sc - 17 * sc, yy - 17 * sc, hx + 52 * sc + 17 * sc, yy + 17 * sc], fill=col + (int(255 * al * down),))
+            lay.rounded_rectangle([hx - 40 * sc, yy - 16 * sc, hx + 30 * sc, yy + 16 * sc], radius=int(14 * sc), fill=col + (int(255 * al * down),))
+            bx1 = px - 30; lay.rounded_rectangle([bx1 - pw, base - ph, bx1, base - 2], radius=18, outline=col + (int(240 * al * down),), width=5)
+        if down < .98:
+            ua = al * (1 - down); yf = base + sink
+            person(lay, px, yf, ua, sc, col=col)
+            bx1 = px - 20 * sc; by1 = yf - 18 * sc
+            lay.rounded_rectangle([bx1 - pw, by1 - ph, bx1, by1], radius=18, outline=col + (int(240 * ua),), width=5)
+            lay.line([bx1 - 6, by1 - ph + 24, px, yf - 52 * sc], fill=col + (int(200 * ua),), width=4)
+            if small > .5 and s.get("small"):
+                text_c(lay, s["small"], yf - 92 * sc - 56, 24, ua * ease((t - res_t - .2) / .3), col=col, cx=px - 20 * sc, sp=4)
+    # item labels inside the big pack (stacked from the bottom), or flying in
+    if small < .5 and down < .5:
+        bx1 = px - 20 * sc; by1 = base + sink - 18 * sc
+        for k, it in enumerate(got):
+            q = ease((t - T(it["beat"])) / .25); yl = by1 - 34 - k * 40 - (1 - q) * 260
+            text_c(d, it["text"], yl - 12, 21, a * (1 - gold) * q * (1 - small * 2), cx=bx1 - pw / 2, sp=3)
 
 
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}

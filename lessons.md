@@ -1,5 +1,10 @@
 # Lessons (keep adding, newest at the top)
 
+## Feedback 2026-11-17 (Adriaan)
+- NO camera punch: "waarom maak je het beeld schokkerig". Leave "punch" out of every spec (score.py's 5 punch points don't count anymore) and keep shakes soft (pillars: shake_amp 3, shake_speed 9).
+- He couldn't download the ~55 MB files. Send a compressed copy: ffmpeg -i X.mp4 -c:v libx264 -preset slow -crf 23 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k X-small.mp4 (about 8 MB) and send that one.
+- "The Five Pages" (match, Conclusion) was rejected as not good; replaced by "The One Sentence Plan" (backpack shot).
+
 ## THE FORMULA from 2026-11-14 (Adriaan: "make a formula and a way to really make this happen"), read FORMULA.md first
 - FORMULA.md is binding on top of the VYZEE section below: hook max 8 words done by 2.3 s, a promise in the first 5 s ("Here's the two strike rule."), something new on screen at least every 2.5 s, "punch": "drop", numbered steps of max 5 words with the full list held 3 s+, examples, gold, and a one word comment question at the end ("comment_q", spoken too).
 - Before rendering: python3 toolkit/score.py SPEC.json. Below 80: fix, don't render. Example at 100/100: toolkit/specs/example-formula-two-strike-rule.json.
