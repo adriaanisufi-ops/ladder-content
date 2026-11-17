@@ -11,6 +11,9 @@ Usage:  python3 toolkit/vyzee.py SPEC.json OUT.mp4 [--preview 0.03,17.3,40]
 Example spec: toolkit/specs/example-vyzee-price-tags.json (the approved video).
 New on 2026-11-16: ghost (the gap: you vs the idea of you running ahead), blueprint (the manual nobody handed you,
 drawn rung by rung), puzzle (a jigsaw piece sanding off its own edges), doors (resistance: START door to push, STOP door to hold).
+New on 2026-11-17: split (WHAT YOU SAY vs WHAT YOU DO drifting apart, caught back), pulse (heart monitor: one spike then a
+flatline, or a steady rhythm), pillars (four statements standing on nothing until the ground slides in), match (books
+stack up next to an unstruck match, then it is struck gold).
 
 Spec:
   length      seconds (about 40 to 45)
@@ -937,6 +940,168 @@ def shot_doors(t, d, g, a, s):
         if 0 <= q < .5: pull -= 40 * math.sin(q / .5 * math.pi)
     px = 540 + pull
     person(d, px, base, a * (1 - gold)); person(g, px, base, a * gold, col=GOLD)
+
+def _head(t, kf):
+    """x of a moving pen head from keyframes [[beat, x], ...] (eased between keyframes)"""
+    x = kf[0][1]
+    for (b0, x0), (b1, x1) in zip(kf, kf[1:]):
+        if t >= T(b0): x = x0 + (x1 - x0) * ease((t - T(b0)) / max(.1, T(b1) - T(b0)))
+    return x
+
+def shot_split(t, d, g, a, s):
+    """the lie you tell yourself: two lines drawn side by side, WHAT YOU SAY (straight) and WHAT YOU DO; every slip
+    (beat, label) bends the lower line further away, every catch (beat) bends it back with a check, gold on 'gold'
+    when they run together. keys: y (story line), head [[beat, x], ...] (pen keyframes), slips [{beat, dy, text}],
+    catches [beats], catch_dy, labels [top, bottom], gap (bracket text), gold"""
+    y0 = s.get("y", 980); kf = s.get("head", [[s["from"], 170], [s["from"] + 30, 900]])
+    slips = s.get("slips", []); catches = [T(b) for b in s.get("catches", [])]; cdy = s.get("catch_dy", 50)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    def off(tau):
+        o = sum(sl.get("dy", 70) * ease((tau - T(sl["beat"])) / .35) for sl in slips)
+        return max(0.0, o - sum(cdy * ease((tau - c) / .3) for c in catches))
+    t0 = T(kf[0][0]); n = max(2, int((t - t0) * 20))
+    taus = [t0 + (t - t0) * i / n for i in range(n + 1)] if t > t0 else [t0]
+    xs = [_head(u, kf) for u in taus]; low = [(x, y0 + 36 + off(u)) for x, u in zip(xs, taus)]
+    hx = xs[-1]; ly = low[-1][1]
+    labels = s.get("labels", ["WHAT YOU SAY", "WHAT YOU DO"])
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        lay.line([kf[0][1], y0, hx, y0], fill=col + (int(240 * al),), width=5)
+        if len(low) > 1: lay.line(low, fill=col + (int(240 * al),), width=5, joint="curve")
+        for yy in (y0, ly): lay.ellipse([hx - 9, yy - 9, hx + 9, yy + 9], fill=col + (int(255 * al),))
+    f = font(28)
+    d.text((kf[0][1], y0 - 50), labels[0], font=f, fill=WHITE + (int(200 * a),))
+    d.text((kf[0][1], y0 + 56), labels[1], font=f, fill=WHITE + (int(200 * a * cl(1 - (off(t) - 40) / 60) if off(t) > 40 else 200 * a),))
+    for sl in slips:
+        q = t - T(sl["beat"])
+        if q < 0 or not sl.get("text"): continue
+        x = _head(T(sl["beat"]), kf); y = y0 + 36 + off(T(sl["beat"]) + .5) + 52
+        x = min(max(x, 150 + len(sl["text"]) * 9), 930 - len(sl["text"]) * 9)
+        pill(d, sl["text"], y, a * ease(q / .15) * (.6 if q > 1.5 else 1), cx=x, sz=26)
+    for c in catches:
+        if t >= c: check(d, _head(c + .3, kf), y0 - 40, 34, a, (t - c) / .15, col=GOLD if gold > .5 else WHITE)
+    gap = ly - y0
+    if gap > 70 and s.get("gap"):
+        bx = hx + 30 if hx < 820 else hx - 30; c = WHITE + (int(200 * a),)
+        d.line([bx, y0 + 10, bx, ly - 10], fill=c, width=3)
+        tw = spaced_w(d, s["gap"], font(26), 4); cx = bx + 20 + tw / 2 if hx < 820 else bx - 20 - tw / 2
+        text_c(d, s["gap"], (y0 + ly) / 2 - 16, 26, a * cl((gap - 70) / 40), cx=cx, sp=4)
+
+def shot_pulse(t, d, g, a, s):
+    """a heart monitor: the trace is drawn left to right by a scan head; bumps are beats of effort. One huge spike
+    (the one big day) followed by a flatline, or a small steady rhythm. keys: box [x0, y0, x1, y1],
+    traces [{from, to, end (beat it disappears), bumps [[x, h, label], ...], every [x0, x1, step, h] (a rhythm), gold}],
+    label (top left of the monitor)"""
+    x0, y0, x1, y1 = s.get("box", [150, 900, 930, 1300]); base = (y0 + y1) / 2 + 60
+    c = WHITE + (int(200 * a),)
+    d.rounded_rectangle([x0, y0, x1, y1], radius=18, outline=c, width=4)
+    for i in range(1, 6):
+        yy = y0 + (y1 - y0) * i / 6; d.line([x0 + 8, yy, x1 - 8, yy], fill=WHITE + (int(22 * a),), width=1)
+    if s.get("label"): d.text((x0 + 24, y0 + 18), s["label"], font=font(22), fill=WHITE + (int(170 * a),))
+    for tr in s.get("traces", []):
+        tf, tt = T(tr["from"]), T(tr["to"])
+        if t < tf or ("end" in tr and t >= T(tr["end"]) + .3): continue
+        fade = cl(1 - (t - T(tr["end"])) / .3) if "end" in tr and t >= T(tr["end"]) else 1.0
+        hx = x0 + 20 + (x1 - x0 - 40) * cl((t - tf) / max(.1, tt - tf))
+        bumps = [list(b) for b in tr.get("bumps", [])]
+        if "every" in tr:
+            e0, e1, st, hh = tr["every"]; bumps += [[float(x), hh, None] for x in np.arange(e0, e1, st)]
+        def yv(x):
+            y = base
+            for b in bumps:
+                dx = x - b[0]; w = 14 if b[1] > 150 else 10
+                y -= b[1] * math.exp(-(dx / w) ** 2) - .35 * b[1] * math.exp(-((dx - 2.2 * w) / w) ** 2)
+            return y
+        pts = [(x, yv(x)) for x in np.arange(x0 + 20, hx, 3)] + [(hx, yv(hx))]
+        gold = ease((t - T(tr["gold"])) / .4) if "gold" in tr else 0
+        for lay, col, al in ((d, WHITE, a * fade * (1 - gold)), (g, GOLD, a * fade * gold)):
+            if al <= .01 or len(pts) < 2: continue
+            lay.line(pts, fill=col + (int(245 * al),), width=5, joint="curve")
+            lay.ellipse([hx - 10, pts[-1][1] - 10, hx + 10, pts[-1][1] + 10], fill=col + (int(255 * al),))
+        for b in bumps:
+            if b[2] and hx >= b[0]:
+                k = (hx - b[0]) / 60; text_c(d, b[2], base - b[1] - 60, 30, a * fade * ease(k), cx=min(max(b[0], 260), 820), sp=4)
+
+def shot_pillars(t, d, g, a, s):
+    """the fifth statement: a beam on pillars (labels) that stand on nothing and shake; on every 'ground' beat one block of
+    the ground slides in under them, when it is complete the shaking stops; gold on 'gold'. keys: labels [{text, beat}],
+    shake [from, to] (beats), ground [beats], ground_label, base, top, gold"""
+    base, top = s.get("base", 1260), s.get("top", 960); labs = s.get("labels", [])
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    gb = [T(b) for b in s.get("ground", [])]; built = sum(1 for b in gb if t >= b)
+    sh = 0.0
+    if "shake" in s:
+        sf, st_ = T(s["shake"][0]), T(s["shake"][1])
+        done = gb and t >= gb[-1]
+        if sf <= t < st_ and not done: sh = math.sin(t * 23) * 7 * (1 - built / max(1, len(gb)))
+    n = max(1, len(labs)); x0, x1 = 190, 890; cw = (x1 - x0) / n
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        c = col + (int(235 * al),)
+        shown = [i for i, lb in enumerate(labs) if t >= T(lb["beat"])]
+        if shown:
+            ba = ease((t - T(labs[0]["beat"])) / .3)
+            lay.rounded_rectangle([x0 - 20 + sh, top - 30, x0 - 20 + (x1 - x0 + 40) * ba + sh, top], radius=6, outline=c, width=4)
+        for i in shown:
+            q = ease((t - T(labs[i]["beat"])) / .25); cx = x0 + cw * (i + .5) + sh * (1.4 if i % 2 else -1.2)
+            ph = (base - 30 - top) * q
+            lay.rounded_rectangle([cx - 34, top, cx + 34, top + ph], radius=6, outline=c, width=4)
+            if q > .8:
+                # vertical label inside the pillar
+                for j, ch in enumerate(labs[i]["text"]):
+                    text_c(lay, ch, top + 24 + j * 34, 28, al * ease((q - .8) / .2), col=col, sp=0, cx=cx)
+        # the ground: blocks slide in from the side, one per ground beat
+        bw = (x1 - x0 + 80) / max(1, len(gb))
+        for k, b in enumerate(gb):
+            if t < b: continue
+            q = ease((t - b) / .3); bx = x0 - 40 + k * bw
+            off = (1 - q) * (-300 if k % 2 == 0 else 300)
+            lay.rectangle([bx + off + 3, base - 22, bx + bw + off - 3, base + 22], outline=c, width=4)
+        if built == len(gb) and gb and s.get("ground_label"):
+            text_c(lay, s["ground_label"], base + 44, 34, al * ease((t - gb[-1] - .3) / .3), col=col, sp=10)
+    if built < len(gb) or not gb:
+        for x in range(150, 930, 34): d.line([x, base + 30, x + 16, base + 30], fill=WHITE + (int(70 * a),), width=3)
+        if built == 0 and labs and t >= T(labs[-1]["beat"]): text_c(d, "?", base + 50, 70, a * (.4 + .2 * math.sin(t * 4)))
+
+def shot_match(t, d, g, a, s):
+    """knowledge without action: books stack up one per beat next to an unstruck match; at 'clear' the books fade, at
+    'strike' the match is struck and a gold flame burns (sparks). keys: books [{beat, text}], counter (text before the
+    count, e.g. "BOOKS READ: "), clear, stand (the match stands up), strike, base, mx (match x)"""
+    base = s.get("base", 1280); mx = s.get("mx", 720)
+    books = s.get("books", []); clear = T(s["clear"]) if "clear" in s else 1e9
+    bf = 1 - ease((t - clear) / .5)
+    d.line([150, base, 930, base], fill=WHITE + (int(160 * a),), width=3)
+    if bf > .01:
+        y = base
+        for i, b in enumerate(books):
+            if t < T(b["beat"]): continue
+            q = ease((t - T(b["beat"])) / .2); h = 54; w = 300 - (i % 3) * 24; x = 330 + ((i * 37) % 3 - 1) * 14
+            yy = y - h - (1 - q) * 300
+            d.rounded_rectangle([x - w / 2, yy, x + w / 2, yy + h], radius=6, outline=WHITE + (int(230 * a * bf * q),), width=4)
+            if b.get("text"): text_c(d, b["text"], yy + 13, 23, a * bf * q, cx=x, sp=3)
+            y -= h + 5
+        nb = sum(1 for b in books if t >= T(b["beat"]))
+        if nb and s.get("counter"): text_c(d, f"{s['counter']}{nb * s.get('per', 1)}", base + 40, 28, a * bf * .85, sp=5, cx=330)
+    st = ease((t - T(s["stand"])) / .4) if "stand" in s else 0
+    strike = T(s["strike"]) if "strike" in s else 1e9; k = t - strike
+    ang = math.radians(-90 * (1 - st) + (25 * math.sin(cl(k / .25) * math.pi) if k >= 0 else 0))
+    L = 260; bx, by = mx, base
+    tx, ty = bx + L * math.sin(ang), by - L * math.cos(ang)
+    lit = k >= .15
+    lay, col = (g, GOLD) if lit else (d, WHITE)
+    lay.line([bx, by - 4, tx, ty], fill=col + (int(235 * a),), width=10)
+    hx, hy = tx + 8 * math.sin(ang), ty - 8 * math.cos(ang)
+    lay.ellipse([hx - 16, hy - 20, hx + 16, hy + 20], fill=col + (int(255 * a),))
+    if lit:
+        fl = ease((k - .15) / .4); fh = (160 + 16 * math.sin(t * 17) + 9 * math.sin(t * 29)) * fl
+        cx, cy = hx, hy - 16
+        pts = [(cx - 34 * fl, cy), (cx - 24 * fl, cy - fh * .5), (cx + 4 * math.sin(t * 13), cy - fh), (cx + 26 * fl, cy - fh * .45), (cx + 34 * fl, cy)]
+        g.polygon(pts + [(cx, cy + 26 * fl)], fill=GOLD + (int(230 * a),))
+        g.ellipse([cx - 14 * fl, cy - fh * .35, cx + 14 * fl, cy + 6], fill=(255, 240, 200, int(230 * a)))
+        if k < .9:
+            for j, (an, sp_) in enumerate(PARTS[:16]):
+                rr = sp_ * .5 * ease(k / .9); x, y = cx + math.cos(an) * rr, cy + math.sin(an) * rr * .7
+                g.ellipse([x - 5, y - 5, x + 5, y + 5], fill=GOLD + (int(255 * a * (1 - k / .9)),))
 
 
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
