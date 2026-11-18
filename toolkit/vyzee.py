@@ -14,7 +14,8 @@ drawn rung by rung), puzzle (a jigsaw piece sanding off its own edges), doors (r
 New on 2026-11-17: split (WHAT YOU SAY vs WHAT YOU DO drifting apart, caught back), pulse (heart monitor: one spike then a
 flatline, or a steady rhythm), pillars (four statements standing on nothing until the ground slides in), match (books
 stack up next to an unstruck match, then it is struck gold), backpack (a plan packed for who you wish you were
-collapses you; resized to what you can carry, you walk).
+collapses you; resized to what you can carry, you walk), vent (the complaint window: open for five minutes, then
+shut, complaints bounce off the glass).
 
 Spec:
   length      seconds (about 40 to 45)
@@ -1333,6 +1334,60 @@ def shot_jar(t, d, g, a, s):
     if s.get("counter") and s.get("fill"):
         n = sum(1 for b in s["fill"] if t >= T(b))
         if n: text_c(g if gold > .5 else d, f"{s['counter']}{n}", base - h - 140, 40, a, col=GOLD if gold > .5 else WHITE, sp=6, cx=cx)
+
+def shot_vent(t, d, g, a, s):
+    """the complaint window: a window opens at 'open', a timer counts down from 'minutes' to 0:00 until 'shut'; every
+    complaint (beat, text) flies out of the open window and fades; at 'shut' both panes slam closed; after that the
+    'bounce' words come at the glass and bounce off; gold on 'gold'. keys: box [x0, y0, x1, y1], open, shut, minutes,
+    out [{beat, text}], bounce [{beat, text}], gold"""
+    x0, y0, x1, y1 = s.get("box", [300, 900, 780, 1300]); cx = (x0 + x1) / 2; w = x1 - x0
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    op = ease((t - T(s.get("open", s["from"]))) / .4) if t >= T(s.get("open", s["from"])) else 0
+    shut = T(s["shut"]) if "shut" in s else 1e9
+    if t >= shut: op = 1 - ease((t - shut) / .18)
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        c = col + (int(235 * al),)
+        lay.rounded_rectangle([x0 - 14, y0 - 14, x1 + 14, y1 + 14], radius=10, outline=c, width=5)
+        lay.line([x0 - 40, y1 + 14, x1 + 40, y1 + 14], fill=c, width=6)
+        # two panes hinged left and right; open = narrow (seen from the side)
+        pw = (w / 2) * (1 - .82 * op)
+        for side in (-1, 1):
+            hx = x0 if side < 0 else x1
+            px = hx - side * pw
+            sk = 26 * op
+            pts = [(hx, y0), (px, y0 - sk), (px, y1 + sk), (hx, y1)]
+            lay.polygon(pts, fill=INK + (int(255 * al),)); lay.line(pts + [pts[0]], fill=c, width=4, joint="curve")
+            mx = (hx + px) / 2; lay.line([mx, y0 - sk / 2, mx, y1 + sk / 2], fill=col + (int(120 * al),), width=2)
+        if op < .1 and t >= shut:   # the glass: a shine line
+            lay.line([x0 + 40, y1 - 60, x0 + 120, y1 - 160], fill=col + (int(90 * al),), width=4)
+    # timer ring
+    if "minutes" in s:
+        o_t = T(s.get("open", s["from"])); frac = cl((t - o_t) / max(.1, shut - o_t))
+        left = s["minutes"] * 60 * (1 - frac); rx, ry, R = cx, y1 + 92, 46
+        lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+        d.ellipse([rx - R, ry - R, rx + R, ry + R], outline=WHITE + (int(70 * a),), width=6)
+        if frac < 1: lay.arc([rx - R, ry - R, rx + R, ry + R], -90, -90 + 360 * (1 - frac), fill=col + (int(240 * a),), width=6)
+        text_c(lay, f"{int(left // 60)}:{int(left % 60):02d}", ry - 17, 30, a, col=col, cx=rx, sp=2)
+    # complaints flying out while open
+    for i, it in enumerate(s.get("out", [])):
+        q = t - T(it["beat"])
+        if q < 0 or q > 1.6: continue
+        k = ease(q / 1.6); ang = [-.9, -.3, .35, .95, -.6, .6][i % 6]
+        x = cx + math.sin(ang) * 300 * k; y = (y0 + y1) / 2 - 40 - 300 * k
+        hw = spaced_w(d, it["text"], font(int(40 - 10 * k)), 3) / 2; x = min(max(x, 150 + hw), 930 - hw)
+        text_c(d, it["text"], y, int(40 - 10 * k), a * cl(1 - (q - .9) / .7) * ease(q / .1), cx=x, sp=3)
+    # complaints bouncing off the closed glass
+    for i, it in enumerate(s.get("bounce", [])):
+        q = t - T(it["beat"])
+        if q < 0 or q > 1.4: continue
+        hit = .35; xo = [-90, 80, -20, 110][i % 4]
+        if q < hit: y = y0 - 260 + (260 + 160) * (q / hit) ** 2
+        else: y = y0 + 160 - 520 * ease((q - hit) / 1.0)
+        al = a * ease(q / .1) * cl(1 - (q - .7) / .7)
+        text_c(d, it["text"], y, 34, al, cx=cx + xo + (q - hit) * 120 * (1 if i % 2 else -1) * (q > hit), sp=3)
+        if hit <= q < hit + .3:
+            r = 30 + 200 * (q - hit); d.ellipse([cx + xo - r, y0 + 180 - r * .3, cx + xo + r, y0 + 180 + r * .3], outline=WHITE + (int(160 * a * (1 - (q - hit) / .3)),), width=3)
 
 
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
