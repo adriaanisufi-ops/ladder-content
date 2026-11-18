@@ -1149,6 +1149,191 @@ def shot_backpack(t, d, g, a, s):
             q = ease((t - T(it["beat"])) / .25); yl = by1 - 34 - k * 40 - (1 - q) * 260
             text_c(d, it["text"], yl - 12, 21, a * (1 - gold) * q * (1 - small * 2), cx=bx1 - pw / 2, sp=3)
 
+def shot_compass(t, d, g, a, s):
+    """burning desire: a compass with no north. The needle spins between vague wants (words around the ring); every
+    'steady' beat calms the swing a bit, at 'lock' it points straight up, gold on 'gold'.
+    keys: cx, cy, r, wants [{text, beat, ang (degrees, 0 = up)}], clear (wants fade), spin (rad/s), steady [beats], lock, gold"""
+    cx, cy, R = s.get("cx", 540), s.get("cy", 900), s.get("r", 260)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    st = [T(b) for b in s.get("steady", [])]; k = sum(1 for b in st if t >= b)
+    if k == 0: ang = t * s.get("spin", 4.2) + .9 * math.sin(t * 2.3)
+    else:
+        amp = math.pi * .8 * (1 - k / (len(st) + 1)); kk = t - st[k - 1]
+        ang = amp * math.sin(t * 6.5) * (1 + .6 * math.exp(-kk * 8))
+    if "lock" in s:
+        q = ease((t - T(s["lock"])) / .5); ang = ang * (1 - q)
+    clear = T(s["clear"]) if "clear" in s else 1e9; cf = 1 - ease((t - clear) / .4)
+    for w in s.get("wants", []):
+        if t < T(w["beat"]) or cf <= .01: continue
+        q = ease((t - T(w["beat"])) / .2); wa = math.radians(w.get("ang", 0))
+        text_c(d, w["text"], cy - math.cos(wa) * (R + 110) - 18, 30, a * q * cf * .9, sp=4, cx=cx + math.sin(wa) * (R + 60))
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        c = col + (int(235 * al),)
+        lay.ellipse([cx - R, cy - R, cx + R, cy + R], outline=c, width=5)
+        lay.ellipse([cx - R + 26, cy - R + 26, cx + R - 26, cy + R - 26], outline=col + (int(90 * al),), width=2)
+        for i in range(24):
+            ta = math.radians(i * 15); r0 = R - (26 if i % 6 == 0 else 14)
+            lay.line([cx + math.sin(ta) * r0, cy - math.cos(ta) * r0, cx + math.sin(ta) * (R - 4), cy - math.cos(ta) * (R - 4)], fill=c, width=4 if i % 6 == 0 else 2)
+        locked = ease((t - T(s["lock"])) / .5) if "lock" in s else 0
+        text_c(lay, "N", cy - R + 34, int(R * .17), al * (.35 + .65 * locked), col=col, sp=0, cx=cx)
+        L, Wn = R * .72, R * .1
+        tip = (cx + math.sin(ang) * L, cy - math.cos(ang) * L); tail = (cx - math.sin(ang) * L * .8, cy + math.cos(ang) * L * .8)
+        lft = (cx - math.cos(ang) * Wn, cy - math.sin(ang) * Wn); rgt = (cx + math.cos(ang) * Wn, cy + math.sin(ang) * Wn)
+        lay.polygon([tip, lft, (cx, cy), rgt], fill=col + (int(250 * al),))
+        lay.polygon([tail, lft, (cx, cy), rgt], outline=c, width=4)
+        lay.line([lft, tail, rgt], fill=c, width=4)
+        lay.ellipse([cx - 12, cy - 12, cx + 12, cy + 12], fill=col + (int(250 * al),))
+
+def shot_poster(t, d, g, a, s):
+    """true belief: borrowed belief = motivational posters taped to a wall; each falls off on its 'fall' beat and lies on
+    the floor. Then a blank page where your own sentence is written line by line; gold on 'gold' (page + gold_line).
+    keys: posters [{text, beat, fall}], page (beat), lines [{text, beat}], gold, gold_line (index, default last), top (page y)"""
+    slots = [(320, 650, -4), (760, 700, 3), (540, 1000, -2), (300, 980, 2), (780, 1010, -3)]
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    ground(d, a)
+    for i, p in enumerate(s.get("posters", [])):
+        if t < T(p["beat"]): continue
+        x, y, rot = slots[i % len(slots)]; q = ease((t - T(p["beat"])) / .25); pw, ph = 300, 210
+        img = Image.new("RGBA", (pw + 20, ph + 40), (0, 0, 0, 0)); pd = ImageDraw.Draw(img)
+        fall = T(p["fall"]) if "fall" in p else 1e9; k = t - fall
+        al = a * q * (1 - .65 * ease(k / .8) if k > 0 else 1)
+        pd.rectangle([10, 20, pw + 10, ph + 20], outline=WHITE + (int(235 * al),), width=4)
+        if k < .25:
+            for tx in (40, pw - 20): pd.rectangle([tx - 24, 8, tx + 24, 30], fill=WHITE + (int(170 * al),))
+        sz = 36
+        while sz > 22 and any(spaced_w(pd, wd, font(sz), sz * .08) > pw - 50 for wd in p["text"].split()): sz -= 2
+        lines = wrap_lines(pd, p["text"], sz, pw - 50)
+        for j, ln in enumerate(lines):
+            text_c(pd, ln, 20 + ph / 2 - len(lines) * sz * .58 + j * sz * 1.15, sz, al * (1 - ease(k / .4) * .5 if k > 0 else 1), cx=10 + pw / 2)
+        r = rot + math.sin(t * 1.6 + i) * 1.2
+        if k > 0:
+            r = rot + 28 * ease(k / .5) * (1 if i % 2 else -1)
+            land = math.sqrt(max(0, GROUND - 60 - y) / 1400); y = y + min(GROUND - 60 - y, 1400 * k * k)
+            fl = ease((k - land) / .25)
+            if fl > 0:   # lands flat on the floor
+                r = r * (1 - fl); img = img.resize((img.width, max(8, int(img.height * (1 - .8 * fl)))))
+                y = y + (GROUND - 60 - y) * 0 + 60 * fl - img.height / 2 * fl + (img.height / 2) * 0
+                x = x + (i - 1) * 40 * fl
+        else: y -= (1 - q) * 120
+        rim = img.rotate(r, resample=Image.BICUBIC, expand=True)
+        d._image.alpha_composite(rim, (int(x - rim.width / 2), int(y - rim.height / 2)))
+    if "page" in s and t >= T(s["page"]):
+        q = ease((t - T(s["page"])) / .3); top = s.get("top", 520); x0, x1 = 190, 890; y1 = top + 640
+        gl = s.get("gold_line", len(s.get("lines", [])) - 1)
+        for lay, col, al in ((d, WHITE, a * q * (1 - gold)), (g, GOLD, a * q * gold)):
+            if al > .01: lay.rectangle([x0, top + (1 - q) * 60, x1, y1], outline=col + (int(235 * al),), width=4)
+        yy = top + 70
+        for j, ln in enumerate(s.get("lines", [])):
+            if t < T(ln["beat"]): yy += 60 + 52 * len(wrap_lines(d, ln["text"], 44, 600, 2)) - 52; continue
+            kk = t - T(ln["beat"]); txt = ln["text"]; n = int(len(txt) * cl(kk / .45))
+            gj = gold if j == gl else 0
+            for lay, col, al in ((d, WHITE, a * (1 - gj)), (g, GOLD, a * gj)):
+                if al <= .01: continue
+                f = font(44); ws = wrap_lines(d, txt, 44, 600, 2); used = 0
+                for m, w_ in enumerate(ws):
+                    part = w_[:max(0, n - used)]; used += len(w_) + 1; x = 230
+                    for ch in part: lay.text((x, yy + m * 52), ch, font=f, fill=col + (int(255 * al),)); x += d.textlength(ch, font=f) + 2
+            yy += 60 + 52 * len(wrap_lines(d, txt, 44, 600, 2)) - 52 + 50
+
+def _stick(lay, col, al, hip, sh, head, hands, knees, feet, w=12):
+    c = col + (int(245 * al),)
+    lay.line([hip, sh], fill=c, width=w)
+    for hd in hands: lay.line([sh, hd], fill=c, width=w, joint="curve")
+    for kn, ft in zip(knees, feet): lay.line([hip, kn, ft], fill=c, width=w, joint="curve")
+    lay.ellipse([head[0] - 26, head[1] - 26, head[0] + 26, head[1] + 26], fill=c)
+
+def shot_puppet(t, d, g, a, s):
+    """fierce plan: a figure hanging from strings on a bar labelled MOOD; on every 'jerk' beat the bar tilts and the figure
+    is yanked. On every 'cut' beat one string (left hand, left knee, right knee, right hand) is cut; after the last cut the
+    figure lands and stands on its own; gold on 'gold'. keys: top (bar y), label, jerks [beats], cuts [beats], gold"""
+    top = s.get("top", 800); cx = 540; label = s.get("label", "MOOD")
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    cuts = [T(b) for b in s.get("cuts", [])]; ncut = sum(1 for b in cuts if t >= b)
+    land = cuts[-1] + .12 if len(cuts) == 4 else 1e9; lq = ease((t - land) / .3)
+    tilt = 0.0; yank = 0.0
+    for i, b in enumerate(s.get("jerks", [])):
+        k = t - T(b)
+        if k >= 0: e = math.exp(-k * 4.5); tilt += (1 if i % 2 == 0 else -1) * .22 * e * math.cos(k * 9); yank += 40 * math.exp(-k * 7)
+    sway = math.sin(t * 1.7) * 10 * (1 - lq) + tilt * 120
+    hang = top + 290 - yank; stand = GROUND - 140
+    hy = hang * (1 - lq) + stand * lq; hx = cx + sway * (1 - lq)
+    hip = (hx, hy); sh = (hx, hy - 100); head = (hx, hy - 146)
+    bar_a = a * (1 - .7 * ease((t - land) / .5))
+    bx0, bx1 = cx - 200, cx + 200; dy = math.sin(tilt) * 200
+    bl, br = (bx0, top - dy), (bx1, top + dy)
+    d.line([bl, br], fill=WHITE + (int(235 * bar_a),), width=8)
+    d.line([(cx, top), (cx, top - 120)], fill=WHITE + (int(160 * bar_a),), width=3)
+    text_c(d, label, top - 70, 30, bar_a, sp=8, cx=cx + 90)
+    anchors = [(bl[0] + 30, bl[1] + 8 * (bl[1] > br[1])), (cx - 70, top - dy * .35), (cx + 70, top + dy * .35), (br[0] - 30, br[1])]
+    cut_k = [cl((t - cuts[i]) / .2) if i < len(cuts) else 0 for i in range(4)]
+    hands = []; knees = []; feet = []
+    for side, i in ((-1, 0), (1, 3)):
+        up = (hx + side * 85, hy - 175 - (20 if yank > 5 else 0)); down = (hx + side * 40, hy - 10)
+        q = ease(cut_k[i]) if ncut > i else 0
+        if lq > 0: q = 1
+        hands.append((up[0] * (1 - q) + down[0] * q, up[1] * (1 - q) + down[1] * q))
+    for side, i in ((-1, 1), (1, 2)):
+        q = ease(cut_k[i]) if ncut > i else 0
+        if lq > 0: q = 1
+        kn = (hx + side * (40 * (1 - q) + 18 * q), hy + 50 * (1 - q) + 70 * q); knees.append(kn)
+        feet.append((kn[0] + side * (6 * (1 - q) + 6 * q), kn[1] + 70 + 10 * (1 - q)))
+    ends = [hands[0], knees[0], knees[1], hands[1]]
+    for i, (an, en) in enumerate(zip(anchors, ends)):
+        if t < (cuts[i] if i < len(cuts) else 1e9):
+            d.line([an, en], fill=WHITE + (int(170 * a),), width=2)
+        else:
+            k = t - cuts[i]; mid = ((an[0] + en[0]) / 2, (an[1] + en[1]) / 2); fa = cl(1 - k / .5)
+            if fa > 0:
+                d.line([an, (mid[0], mid[1] - 40 * k)], fill=WHITE + (int(170 * a * fa),), width=2)
+                d.line([(mid[0], mid[1] + 300 * k * k), en], fill=WHITE + (int(170 * a * fa),), width=2)
+            if k < .35:
+                for j, (pa, ps) in enumerate(PARTS[:8]):
+                    rr = ps * .12 * ease(k / .35); d.ellipse([mid[0] + math.cos(pa) * rr - 4, mid[1] + math.sin(pa) * rr - 4, mid[0] + math.cos(pa) * rr + 4, mid[1] + math.sin(pa) * rr + 4], fill=WHITE + (int(255 * a * (1 - k / .35)),))
+    for x in range(150, 930, 34): d.line([x, GROUND, x + 16, GROUND], fill=WHITE + (int(110 * a),), width=3)
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al > .01: _stick(lay, col, al, hip, sh, head, hands, knees, feet)
+
+def shot_jar(t, d, g, a, s):
+    """relentless action: self trust as a jar of coins. Named coins (promises) drop in on 'beat' with their text above the
+    jar and fly back out with a cross on 'out' (broken). 'fill' coins drop in one per beat (kept promises) with an optional
+    counter; gold on 'gold'. keys: base, label, coins [{text, beat, out}], fill [beats], counter (e.g. "KEPT: "), gold"""
+    cx, base = s.get("cx", 540), s.get("base", 1320); w, h = 340, 400
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    ev = []
+    for c_ in s.get("coins", []): ev.append((T(c_["beat"]), T(c_["out"]) if "out" in c_ else 1e9, c_.get("text")))
+    for b in s.get("fill", []): ev.append((T(b), 1e9, None))
+    ev.sort(key=lambda e: e[0])
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        c = col + (int(235 * al),)
+        lay.rounded_rectangle([cx - w / 2, base - h, cx + w / 2, base], radius=48, outline=c, width=5)
+        lay.rectangle([cx - w / 2 + 50, base - h - 46, cx + w / 2 - 50, base - h + 2], fill=(4, 4, 6, int(255 * al)), outline=c, width=5)
+        lay.line([cx - w / 2 + 40, base - h - 46, cx + w / 2 - 40, base - h - 46], fill=c, width=7)
+        if s.get("label"): text_c(lay, s["label"], base + 26, 28, al * .9, col=col, sp=8, cx=cx)
+    slot = 0; gap = min(24, (h - 80) / max(1, sum(1 for e in ev if e[1] > 1e8)))
+    for i, (b, out, txt) in enumerate(ev):
+        if t < b: continue
+        k = t - b; ty = base - 30 - slot * gap; tx = cx + ((slot * 53) % 7 - 3) * 14
+        sy = base - h - 260; y = sy + (ty - sy) * cl(k / .28) ** 2; al = a
+        if t >= out:
+            ko = t - out; y = ty + (base - h - 180 - ty) * ease(ko / .3); al = a * cl(1 - (ko - .5) / .4)
+            if ko > .3: cross(d, tx, y, 34, al, (ko - .3) / .2)
+        else: slot += 1
+        if al <= .01: continue
+        gi = gold if t < out else 0
+        for lay, col, aa in ((d, WHITE, al * (1 - gi)), (g, GOLD, al * gi)):
+            if aa <= .01: continue
+            lay.ellipse([tx - 70, y - 16, tx + 70, y + 16], fill=col + (int(240 * aa),))
+            lay.ellipse([tx - 48, y - 8, tx + 48, y + 8], outline=(4, 4, 6, int(200 * aa)), width=3)
+        if txt:
+            if t < out: ta = a * ease(k / .15) * cl((b + 1.25 - t) / .12)
+            else: ta = a * ease((t - out) / .1) * cl((out + .5 - t) / .08)
+            if ta > .01: pill(d, txt, base - h - 330, ta, sz=34)
+    if s.get("counter") and s.get("fill"):
+        n = sum(1 for b in s["fill"] if t >= T(b))
+        if n: text_c(g if gold > .5 else d, f"{s['counter']}{n}", base - h - 140, 40, a, col=GOLD if gold > .5 else WHITE, sp=6, cx=cx)
+
 
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
 
