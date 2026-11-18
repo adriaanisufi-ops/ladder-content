@@ -1,5 +1,10 @@
 # Lessons (keep adding, newest at the top)
 
+## Direction change 2026-11-18 (Adriaan, not final yet)
+- "Ik merk dat ik op volume aan het draaien ben maar de creativiteit sterk omlaag gaat." He no longer wants every video tied to the book: life lessons he learned himself (source: his Obsidian notes; HOW we get them into the run is not decided yet, see the chat).
+- Tone: relatable, not specific to him, but also not generic. Rule of thumb: take his lesson, drop the private details (names, places, his exact story), keep ONE concrete moment almost everyone has lived (the phone in your hand at 1 am, rereading a message before sending it, the gym bag that stays by the door). No abstract quotes ("discipline is freedom"), no diary entries.
+- Until the source is decided, keep using the book in the daily run, but write it this way.
+
 ## Feedback 2026-11-17 (Adriaan)
 - NO camera punch: "waarom maak je het beeld schokkerig". Leave "punch" out of every spec (score.py's 5 punch points don't count anymore) and keep shakes soft (pillars: shake_amp 3, shake_speed 9).
 - He couldn't download the ~55 MB files. Send a compressed copy: ffmpeg -i X.mp4 -c:v libx264 -preset slow -crf 23 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 160k X-small.mp4 (about 8 MB) and send that one.
