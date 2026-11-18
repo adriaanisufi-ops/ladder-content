@@ -19,7 +19,8 @@ shut, complaints bounce off the glass).
 
 Spec:
   length      seconds (about 40 to 45)
-  voice       Kokoro voice (default am_michael), speed (default 1.05)
+  voice       Kokoro voice (default am_michael), speed (default 1.05), pitch (1.04 = a bit higher), voice_fx "bright"
+              (Adriaan's pick 2026-11-18: speed 1.12, pitch 1.04, voice_fx bright = warmer, more energetic, motivating)
   lines       [{"beat": 4, "text": "..."}]  or {"at": 0.12, ...}: spoken lines, start on a beat of GRID
   text        [{"from": 0, "to": 4, "big": "..."} | {"pill": "..."} | {"small": "..."}, optional "y", "size", "gold"]
               on-screen words; from/to are beat numbers (floats ok) or {"t": seconds}; "to" may be omitted
@@ -1109,22 +1110,27 @@ def shot_backpack(t, d, g, a, s):
     """build it the size you can carry: a figure with a backpack; every item (beat, text) drops into the pack and makes it
     bigger and the figure sinks; at 'collapse' he goes down flat with the pack beside him; at 'resize' he stands up with a
     small pack (small label) and takes one step per 'walk' beat, leaving footprints; gold on 'gold'.
-    keys: x (start), base, scale, items [{beat, text}], collapse, resize, small, walk [beats], step, gold"""
+    keys: x (start), base, scale, pack_w (base width, default 150), items [{beat, text}], collapse, resize, small, drop (he sets the pack down on the ground
+    and walks on without it), walk [beats], step, step2 (step after the drop), gold"""
     base = s.get("base", 1300); sc = s.get("scale", 1.5); x0 = s.get("x", 330); step = s.get("step", 55)
     gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
     items = s.get("items", []); got = [it for it in items if t >= T(it["beat"])]
     col_t = T(s["collapse"]) if "collapse" in s else 1e9; res_t = T(s["resize"]) if "resize" in s else 1e9
     walks = [T(b) for b in s.get("walk", [])]
-    px = x0 + sum(step * ease((t - w) / .35) for w in walks)
+    drop_t = T(s["drop"]) if "drop" in s else 1e9
+    steps = [s.get("step2", step) if w >= drop_t else step for w in walks]
+    px = x0 + sum(st_ * ease((t - w) / .35) for w, st_ in zip(walks, steps))
     grow = sum(ease((t - T(it["beat"])) / .25) for it in got)
     small = ease((t - res_t) / .4)
-    pw = (150 + 14 * grow) * (1 - small) + 64 * small; ph = (90 + 100 * grow) * (1 - small) + 74 * small
+    pw = (s.get("pack_w", 150) + 14 * grow) * (1 - small) + 64 * small; ph = (90 + 100 * grow) * (1 - small) + 74 * small
     sink = min(28, 7 * grow) * (1 - small) if t < col_t else 0
     down = ease((t - col_t) / .35) * (1 - ease((t - res_t) / .4))
+    dropped = t >= drop_t
+    if dropped: sink = sink * (1 - ease((t - drop_t) / .4))
     ground(d, a)
     for i, w in enumerate(walks):
         if t >= w + .3:
-            fx = x0 + step * i + 14; lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+            fx = x0 + sum(steps[:i + 1]) - 14; lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
             lay.rounded_rectangle([fx - 10, base + 12, fx + 10, base + 18], radius=3, fill=col + (int(200 * a),))
     for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
         if al <= .01: continue
@@ -1138,17 +1144,24 @@ def shot_backpack(t, d, g, a, s):
         if down < .98:
             ua = al * (1 - down); yf = base + sink
             person(lay, px, yf, ua, sc, col=col)
-            bx1 = px - 20 * sc; by1 = yf - 18 * sc
-            lay.rounded_rectangle([bx1 - pw, by1 - ph, bx1, by1], radius=18, outline=col + (int(240 * ua),), width=5)
-            lay.line([bx1 - 6, by1 - ph + 24, px, yf - 52 * sc], fill=col + (int(200 * ua),), width=4)
+            if not dropped:
+                bx1 = px - 20 * sc; by1 = yf - 18 * sc
+                lay.rounded_rectangle([bx1 - pw, by1 - ph, bx1, by1], radius=18, outline=col + (int(240 * ua),), width=5)
+                lay.line([bx1 - 6, by1 - ph + 24, px, yf - 52 * sc], fill=col + (int(200 * ua),), width=4)
             if small > .5 and s.get("small"):
                 text_c(lay, s["small"], yf - 92 * sc - 56, 24, ua * ease((t - res_t - .2) / .3), col=col, cx=px - 20 * sc, sp=4)
+    if dropped:   # the pack stays where he set it down, white and fading, never gold
+        bx1 = x0 + sum(st_ for w, st_ in zip(walks, steps) if w <= drop_t) - 20 * sc
+        fa = a * (1 - .6 * ease((t - drop_t - 1.5) / 1.5))
+        d.rounded_rectangle([bx1 - pw, base - ph, bx1, base], radius=18, outline=WHITE + (int(240 * fa),), width=5)
     # item labels inside the big pack (stacked from the bottom), or flying in
     if small < .5 and down < .5:
         bx1 = px - 20 * sc; by1 = base + sink - 18 * sc
+        if dropped:
+            bx1 = x0 + sum(st_ for w, st_ in zip(walks, steps) if w <= drop_t) - 20 * sc; by1 = base
         for k, it in enumerate(got):
             q = ease((t - T(it["beat"])) / .25); yl = by1 - 34 - k * 40 - (1 - q) * 260
-            text_c(d, it["text"], yl - 12, 21, a * (1 - gold) * q * (1 - small * 2), cx=bx1 - pw / 2, sp=3)
+            text_c(d, it["text"], yl - 12, 19, a * ((1 - .6 * ease((t - drop_t - 1.5) / 1.5)) if dropped else (1 - gold)) * q * (1 - small * 2), cx=bx1 - pw / 2, sp=3)
 
 def shot_compass(t, d, g, a, s):
     """burning desire: a compass with no north. The needle spins between vague wants (words around the ring); every
@@ -1470,9 +1483,15 @@ def voice_track(spec, LEN, out_wav):
         report.append(f"{t0:6.2f}-{end:6.2f} {'OVERLAP ' if t0 < prev - .02 else ''}{'PAST END ' if end > LEN else ''}{ln['text']}")
         prev = end
     raw = out_wav + ".raw.wav"; sf.write(raw, track, SR)
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", raw, "-af",
-                    "highpass=f=80,bass=g=2:f=160,acompressor=threshold=0.08:ratio=4:attack=5:release=150,aecho=0.8:0.25:30:0.06,"
-                    "alimiter=limit=0.9", out_wav], check=True)
+    pitch = float(spec.get("pitch", 1.0))
+    pre = f"asetrate={SR}*{pitch},aresample={SR},atempo={1 / pitch:.5f}," if abs(pitch - 1) > .001 else ""
+    if spec.get("voice_fx") == "bright":   # Adriaan's pick 2026-11-18 (r3-2): faster, a bit higher, presence boost
+        fx = ("highpass=f=90,equalizer=f=3000:t=q:w=1:g=4,treble=g=2:f=6000,acompressor=threshold=0.06:ratio=4:attack=3:release=100,"
+              "aecho=0.8:0.2:25:0.05,alimiter=limit=0.95")
+    else:
+        fx = ("highpass=f=80,bass=g=2:f=160,acompressor=threshold=0.08:ratio=4:attack=5:release=150,aecho=0.8:0.25:30:0.06,"
+              "alimiter=limit=0.9")
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", raw, "-af", pre + fx, out_wav], check=True)
     os.remove(raw)
     print("\n".join(report))
 
