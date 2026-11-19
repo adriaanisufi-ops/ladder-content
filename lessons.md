@@ -1,5 +1,15 @@
 # Lessons (keep adding, newest at the top)
 
+## NEW DEFAULT from 2026-11-19: night footage + warm voice ("carry night") (Adriaan: "good i like this actually")
+Replaces the VYZEE line animations and the numbered methods. Reference: out/2026-11-18/carry-night.json ("You weren't born heavy"), 2026-11-19-night-1/2.
+- Render: python3 toolkit/night.py SPEC.json OUT.mp4 (preview: --preview 0.0,17.4,30). Real night clips from clips/ cut on the VYZEE grid ("cuts"), about 31 s.
+- Feel, not self help: no steps, no lists, no methods (Adriaan: "het zijn self help videos maar dat wil ik niet, ik wil dat mensen het echt gaan voelen"). A relatable moment, it goes deeper, a question before 16.4 s, on the drop the turn ("You weren't born heavy."), short rising lines, a gold last line.
+- Life lessons, not the book (relatable, not about him, not generic; see the 2026-11-18 section).
+- Voice: "speed": 1.12, "pitch": 1.04, "voice_fx": "bright" (Adriaan's pick r3-2: warmer, more energetic, motivating). Exclamation marks on the lift lines.
+- Picture: intro clips desaturated ("sat": .18, rain, tunnels, dark roads), colour back on the drop ("sat": 1, lamps, tunnels, city), a warm city aerial at the end. A different clip every 3 to 6 beats.
+- Text in the MIDDLE (Adriaan 2026-11-19): every text item "y": 780, the shade band is centred there (shade_y 840).
+- Music: still open. Adriaan adds it in TikTok; he'll pick an emotional song with a build and drop around 15 to 18 s, then measure it with beatmap.py and set "sound".
+
 ## Direction change 2026-11-18 (Adriaan, not final yet)
 - "Ik merk dat ik op volume aan het draaien ben maar de creativiteit sterk omlaag gaat." He no longer wants every video tied to the book: life lessons he learned himself (source: his Obsidian notes; HOW we get them into the run is not decided yet, see the chat).
 - Tone: relatable, not specific to him, but also not generic. Rule of thumb: take his lesson, drop the private details (names, places, his exact story), keep ONE concrete moment almost everyone has lived (the phone in your hand at 1 am, rereading a message before sending it, the gym bag that stays by the door). No abstract quotes ("discipline is freedom"), no diary entries.

@@ -7,7 +7,8 @@ Usage:  python3 toolkit/night.py SPEC.json OUT.mp4 [--preview 0.5,17.3,30]
 Spec: everything vyzee.py takes for "lines", "text", "length", "sound", "speed", "pitch", "voice_fx", plus
   cuts   [{"from": beat, "clip": "pex-35147217.mp4", "start": seconds into the clip (default 1), "sat": 0..1 (colour,
           default 1), "dark": 0..1 (default 0), "speed": playback speed (default 1)}]  each cut runs until the next one
-  shade  how dark the top band behind the text is (default .75)
+  shade  how dark the band behind the text is (default .75), shade_y its centre (default 840: text in the middle,
+         Adriaan 2026-11-19 "I need the text more to the middle"; put text items at "y": 780)
 """
 import json, os, subprocess, sys, tempfile
 import numpy as np
@@ -32,10 +33,10 @@ def build_base(spec, LEN, out):
     lst = os.path.join(tmp, "list.txt"); open(lst, "w").write("".join(f"file '{p}'\n" for p in parts))
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", out], check=True)
 
-def shade_layer(k):
-    """dark band at the top behind the text plus a soft vignette"""
+def shade_layer(k, cy=840):
+    """dark band behind the text (centred on cy, the middle of the screen since 2026-11-19) plus a soft vignette"""
     yy, xx = np.mgrid[0:V.H, 0:V.W]
-    top = np.clip(1 - (yy - 150) / 650, 0, 1) * k
+    top = np.clip(1 - np.abs(yy - cy) / 420, 0, 1) ** .8 * k
     vig = np.clip(np.sqrt(((xx - 540) / 760) ** 2 + ((yy - 960) / 1250) ** 2) - .55, 0, 1) * .8
     a = np.clip(np.maximum(top, vig), 0, .92)
     return Image.fromarray((a * 255).astype(np.uint8), "L")
@@ -55,7 +56,7 @@ def main():
     spec = json.load(open(sys.argv[1])); out = sys.argv[2]; LEN = float(spec.get("length", 30))
     if spec.get("sound"): V.load_sound(spec["sound"])
     base = out.replace(".mp4", ".base.mp4"); build_base(spec, LEN, base)
-    shade = shade_layer(spec.get("shade", .75))
+    shade = shade_layer(spec.get("shade", .75), spec.get("shade_y", 840))
     rd = subprocess.Popen(["ffmpeg", "-v", "error", "-i", base, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
     n = int(LEN * V.FPS); fsz = V.W * V.H * 3
     prev = [float(x) for x in sys.argv[4].split(",")] if len(sys.argv) > 4 and sys.argv[3] == "--preview" else None
