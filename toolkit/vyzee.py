@@ -16,6 +16,9 @@ flatline, or a steady rhythm), pillars (four statements standing on nothing unti
 stack up next to an unstruck match, then it is struck gold), backpack (a plan packed for who you wish you were
 collapses you; resized to what you can carry, you walk), vent (the complaint window: open for five minutes, then
 shut, complaints bounce off the glass).
+New on 2026-11-19: gate (the price: a locked gate you keep pushing, coins in the slot open it), urge (boredom: the urge
+as a wave; feed it a phone and it comes back higher, leave it and it falls flat), boxes (name the real thing: open the
+goal box with every why until the real reason glows), gauge (the words you feed yourself: a COLD to READY warm up gauge).
 
 Spec:
   length      seconds (about 40 to 45)
@@ -1401,6 +1404,173 @@ def shot_vent(t, d, g, a, s):
         text_c(d, it["text"], y, 34, al, cx=cx + xo + (q - hit) * 120 * (1 if i % 2 else -1) * (q > hit), sp=3)
         if hit <= q < hit + .3:
             r = 30 + 200 * (q - hit); d.ellipse([cx + xo - r, y0 + 180 - r * .3, cx + xo + r, y0 + 180 + r * .3], outline=WHITE + (int(160 * a * (1 - (q - hit) / .3)),), width=3)
+
+def shot_gate(t, d, g, a, s):
+    """the price tag: a locked gate you keep pushing without paying. The figure walks up (walk keyframes), bumps into the
+    gate on every 'bumps' beat (it rattles), coins (the real price, beat + text) drop into the slot on the left post, at
+    'open' the gate swings open and the figure walks through; gold on 'gold'.
+    keys: base, gx [x0, x1] (gate panel), walk [[beat, x], ...], bumps [beats], coins [{beat, text}], sign, open, gold"""
+    base = s.get("base", GROUND); gx0, gx1 = s.get("gx", [560, 770]); top = base - 330
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    op = ease((t - T(s["open"])) / .5) if "open" in s and t >= T(s["open"]) else 0
+    shk = 0.0
+    for b in s.get("bumps", []):
+        k = t - T(b)
+        if 0 <= k < .45: shk += math.sin(k * 60) * 9 * (1 - k / .45)
+    kf = s.get("walk", [[s["from"], 260]]); px = kf[0][1]
+    for (b0, x0_), (b1, x1_) in zip(kf, kf[1:]):
+        if t >= T(b0): px = x0_ + (x1_ - x0_) * ease((t - T(b0)) / max(.1, T(b1) - T(b0)))
+    for b in s.get("bumps", []):
+        k = t - T(b)
+        if 0 <= k < .45: px += 14 * math.sin(math.pi * k / .45)
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        c = col + (int(235 * al),)
+        lay.line([140, base, 940, base], fill=col + (int(160 * al),), width=3)
+        for x in (gx0 - 16, gx1 + 16):
+            lay.rectangle([x - 12, top - 40, x + 12, base], outline=c, width=4)
+        # coin box with slot on the left post
+        bx, by = gx0 - 86, top + 30
+        lay.rounded_rectangle([bx - 46, by - 60, bx + 46, by + 60], radius=10, fill=INK + (int(255 * al),), outline=c, width=4)
+        lay.line([bx - 20, by - 30, bx + 20, by - 30], fill=c, width=6)
+        if s.get("sign"): text_c(lay, s["sign"], by + 2, 22, al * .9, col=col, cx=bx, sp=3)
+        # the panel, hinged on the right post; open = seen from the side
+        pw = (gx1 - gx0) * (1 - .86 * op); sx = shk * (1 - op); sk = 30 * op
+        pts = [(gx1, top), (gx1 - pw + sx, top - sk), (gx1 - pw + sx, base - 20 + sk), (gx1, base - 20)]
+        lay.polygon(pts, fill=INK + (int(255 * al),)); lay.line(pts + [pts[0]], fill=c, width=5, joint="curve")
+        for i in range(1, 5):
+            q = i / 5; xa = gx1 - pw * q + sx * q
+            lay.line([xa, top - sk * q + 10, xa, base - 30 + sk * q], fill=col + (int(170 * al),), width=4)
+        if op < .3:   # padlock
+            la = al * (1 - op / .3); lx, ly = gx1 - pw / 2 + sx / 2, (top + base) / 2
+            lay.arc([lx - 22, ly - 52, lx + 22, ly - 8], 180, 360, fill=col + (int(235 * la),), width=6)
+            lay.rounded_rectangle([lx - 32, ly - 30, lx + 32, ly + 22], radius=6, fill=col + (int(235 * la),))
+    person(d, px, base, a * (1 - gold), s=2.2); person(g, px, base, a * gold, s=2.2, col=GOLD)
+    for it in s.get("coins", []):
+        k = t - T(it["beat"])
+        if k < -.3 or k > 1.4: continue
+        bx, by = gx0 - 86, top - 30
+        y = by - 420 + 420 * cl((k + .3) / .3) ** 2
+        if k < 0.02:
+            d.ellipse([bx - 30, y - 30, bx + 30, y + 30], outline=WHITE + (int(240 * a),), width=6)
+            text_c(d, "$", y - 24, 38, a, cx=bx, sp=0)
+        else:
+            r = 60 * k; d.ellipse([bx - r, by - r * .4, bx + r, by + r * .4], outline=WHITE + (int(200 * a * cl(1 - k / .4)),), width=3)
+        ta = a * ease((k + .3) / .15) * cl((1.4 - k) / .2)
+        if ta > .01: pill(d, it["text"], top - 520, ta, sz=36)
+
+def shot_urge(t, d, g, a, s):
+    """the art of boredom: the urge as a wave over a flat line. Every wave rises from 'start' to its 'peak'. A fed wave
+    (feed true) gets a phone dropped on its peak and collapses, the next one comes back higher. An unfed wave peaks and
+    slowly falls flat on its own by 'end'. keys: base, waves [{start, peak, end, h, label, feed}], timer {from, to, max}
+    (seconds counter under the line), figure (x of a figure with empty hands), title, gold (the line turns gold)"""
+    base = s.get("base", 1180); x0, x1, cx, sig = 150, 930, s.get("cx", 590), s.get("sig", 150)
+    gold = ease((t - T(s["gold"])) / .5) if "gold" in s else 0
+    Hs = []
+    for w in s["waves"]:
+        st, pk = T(w["start"]), T(w["peak"]); en = T(w["end"]) if "end" in w else pk + 3
+        if t < st: continue
+        if t < pk: hh = w["h"] * (cl((t - st) / max(.1, pk - st)) ** 1.6)
+        elif w.get("feed"): hh = w["h"] * (1 - ease((t - pk - .08) / .22)) if t > pk + .08 else w["h"]
+        else: hh = w["h"] * (1 - ease((t - pk) / max(.1, en - pk)) ** .9)
+        if hh > 1: Hs.append((hh, w, pk))
+    def yv(x): return base - sum(hh * math.exp(-((x - cx) / sig) ** 2) for hh, _, _ in Hs)
+    pts = [(x, yv(x)) for x in range(x0, x1 + 1, 4)]
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al > .01: lay.line(pts, fill=col + (int(245 * al),), width=6, joint="curve")
+    if s.get("title"): text_c(d, s["title"], base + 40, 26, a * .7, sp=8, cx=cx)
+    for hh, w, pk in Hs:
+        top = base - hh
+        if w.get("label"):
+            text_c(d, w["label"], top - 70, 34, a * cl(hh / 60), cx=cx, sp=4)
+        if w.get("feed"):
+            k = t - (pk - .25)
+            if 0 <= k < .6:
+                py = (top - 420) + 420 * cl(k / .25) ** 2 - 60 if k < .25 else top - 60
+                pa = a * cl((.6 - k) / .2)
+                d.rounded_rectangle([cx - 30, py - 50, cx + 30, py + 50], radius=10, fill=WHITE + (int(240 * pa),))
+                d.rounded_rectangle([cx - 22, py - 40, cx + 22, py + 32], radius=4, fill=INK + (int(255 * pa),))
+                if k > .25:
+                    r = 40 + 260 * (k - .25); d.ellipse([cx - r, top - r * .3, cx + r, top + r * .3], outline=WHITE + (int(170 * pa),), width=3)
+    if "figure" in s:
+        person(d, s["figure"], base, a * (1 - gold), s=1.6); person(g, s["figure"], base, a * gold, s=1.6, col=GOLD)
+    tm = s.get("timer")
+    if tm and t >= T(tm["from"]):
+        sec = int(tm.get("max", 90) * cl((t - T(tm["from"])) / max(.1, T(tm["to"]) - T(tm["from"]))))
+        lay, col = (g, GOLD) if gold > .5 else (d, WHITE)
+        text_c(lay, f"{sec // 60}:{sec % 60:02d}", base + 90, 56, a * ease((t - T(tm["from"])) / .2), col=col, cx=cx, sp=4)
+
+def shot_boxes(t, d, g, a, s):
+    """name the real thing: the goal is a box; every 'opens' beat the lid flies off and a smaller box rises out of it with
+    the next answer (levels); the last level glows; 'shake' beats rattle the closed box; front labels of the outer box
+    cycle (labels [{text, beat}], last one wins). keys: cx, base, w, h, labels, levels [texts], opens [beats], shake, gold"""
+    cx, base = s.get("cx", 540), s.get("base", 1260); W0, H0 = s.get("w", 520), s.get("h", 300)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    opens = [T(b) for b in s.get("opens", [])]; lv = sum(1 for o in opens if t >= o)
+    levels = s.get("levels", [])
+    shk = 0.0
+    for b in s.get("shake", []):
+        k = t - T(b)
+        if 0 <= k < .4: shk += math.sin(k * 55) * 8 * (1 - k / .4)
+    def box(lay, col, al, i, sc, dy, lid_dy, lid_a, label, glow=False):
+        w, h = W0 * .87 ** i * sc, H0 * .87 ** i * sc; x = cx + (shk if i == 0 else 0)
+        y1 = base + dy; y0 = y1 - h; c = col + (int(235 * al),)
+        lay.rectangle([x - w / 2, y0, x + w / 2, y1], fill=INK + (int(255 * al),), outline=c, width=5)
+        if glow: lay.rectangle([x - w / 2 + 14, y0 + 14, x + w / 2 - 14, y1 - 14], outline=col + (int(120 * al),), width=3)
+        if lid_a > .01:
+            la = al * lid_a
+            lay.rectangle([x - w / 2 - 16, y0 - 40 + lid_dy, x + w / 2 + 16, y0 + lid_dy], fill=INK + (int(255 * la),), outline=col + (int(235 * la),), width=5)
+        if label:
+            sz = 46 if i == 0 else 40
+            while sz > 26 and spaced_w(lay, label, font(sz), sz * .08) > w - 50: sz -= 2
+            text_c(lay, label, (y0 + y1) / 2 - sz * .6, sz, al, col=col, cx=x)
+    lab = None
+    for it in s.get("labels", []):
+        if t >= T(it["beat"]): lab = it["text"]
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        lay.line([140, base, 940, base], fill=col + (int(150 * al),), width=3)
+        if lv > 0:   # the previous box opening and fading
+            k = t - opens[lv - 1]; prev = lab if lv == 1 else levels[lv - 2] if lv - 2 < len(levels) else None
+            pa = al * cl(1 - (k - .25) / .35)
+            if pa > .01: box(lay, col, pa, lv - 1, 1.0, 0, -260 * ease(k / .4), cl(1 - k / .35), prev)
+            nk = ease((k - .1) / .45); txt = levels[lv - 1] if lv - 1 < len(levels) else None
+            box(lay, col, al * nk, lv, .7 + .3 * nk, -30 * math.sin(math.pi * cl((k - .1) / .45)), 0, 1.0 if lv < len(opens) else 0, txt, glow=lv == len(opens))
+        else:
+            box(lay, col, al, 0, 1.0, 0, -6 * abs(shk) / 8, 1.0, lab)
+
+def shot_gauge(t, d, g, a, s):
+    """the words you feed yourself: a warm up gauge from COLD to READY. The needle follows keyframes, shivers on 'sputter'
+    beats; event pills pop above the gauge (pills [{beat, text}], each until the next one or 'to'); gold on 'gold'.
+    keys: cx, cy, r, needle [[beat, value 0..1], ...], sputter [beats], left, right, label, pills, gold"""
+    cx, cy, r = s.get("cx", 540), s.get("cy", 1200), s.get("r", 320)
+    gold = ease((t - T(s["gold"])) / .4) if "gold" in s else 0
+    kf = s.get("needle", [[s["from"], 0.05]]); v = kf[0][1]
+    for (b0, v0), (b1, v1) in zip(kf, kf[1:]):
+        if t >= T(b0): v = v0 + (v1 - v0) * ease((t - T(b0)) / max(.1, T(b1) - T(b0)))
+    for b in s.get("sputter", []):
+        k = t - T(b)
+        if 0 <= k < .6: v += math.sin(k * 45) * .035 * (1 - k / .6)
+    v = cl(v)
+    for lay, col, al in ((d, WHITE, a * (1 - gold)), (g, GOLD, a * gold)):
+        if al <= .01: continue
+        c = col + (int(235 * al),)
+        lay.arc([cx - r, cy - r, cx + r, cy + r], 180, 360, fill=c, width=6)
+        lay.arc([cx - r + 24, cy - r + 24, cx + r - 24, cy + r - 24], 324, 360, fill=col + (int(200 * al),), width=18)
+        for i in range(11):
+            an = math.radians(180 + 18 * i); r0 = r - (40 if i % 5 == 0 else 26)
+            lay.line([cx + math.cos(an) * r0, cy + math.sin(an) * r0, cx + math.cos(an) * (r - 8), cy + math.sin(an) * (r - 8)], fill=c, width=4)
+        text_c(lay, s.get("left", "COLD"), cy + 24, 32, al * .9, col=col, cx=cx - r + 20, sp=5)
+        text_c(lay, s.get("right", "READY"), cy + 24, 32, al * .9, col=col, cx=cx + r - 30, sp=5)
+        if s.get("label"): text_c(lay, s["label"], cy + 90, 26, al * .7, col=col, cx=cx, sp=8)
+        an = math.radians(180 + 180 * v); L = r - 60
+        lay.line([cx, cy, cx + math.cos(an) * L, cy + math.sin(an) * L], fill=col + (int(250 * al),), width=9)
+        lay.ellipse([cx - 22, cy - 22, cx + 22, cy + 22], fill=col + (int(250 * al),))
+    pl = s.get("pills", [])
+    for i, it in enumerate(pl):
+        b0 = T(it["beat"]); b1 = T(pl[i + 1]["beat"]) if i + 1 < len(pl) else T(it.get("to", s.get("to", 999))) if "to" in it or "to" in s else 1e9
+        if b0 <= t < b1:
+            pill(d, it["text"], cy - r - 110, a * ease((t - b0) / .12) * cl((b1 - t) / .1), sz=36)
 
 
 SHOTS = {k[5:]: v for k, v in globals().items() if k.startswith("shot_")}
