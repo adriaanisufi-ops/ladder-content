@@ -1,5 +1,10 @@
 # Lessons (keep adding, newest at the top)
 
+## Ladder dialog is back, as life lessons (Adriaan 2026-11-20: "make videos like this again without ai, i liked these the most")
+- Render like "Juist" with toolkit/ladder_dialog.py, NO typing dots ("i don't like the dots"); lines appear whole. No voice, rain only.
+- Text must hit harder and be relatable: show him the scripts FIRST, he picks. He picked "The unanswered call" (My mom called twice today. I let it ring. / ... / Call her back. She never wanted the version you promised. She wanted you.). He rejected the softer "Stealing back the night" (1 am scrolling).
+- What worked: one concrete everyday moment with a person in it (mom calling), a short follow up ("Hear what?"), the ladder line that names the shame, and an ending that is permission plus one act.
+
 ## NEW DEFAULT from 2026-11-19: night footage + warm voice ("carry night") (Adriaan: "good i like this actually")
 Replaces the VYZEE line animations and the numbered methods. Reference: out/2026-11-18/carry-night.json ("You weren't born heavy"), 2026-11-19-night-1/2.
 - Render: python3 toolkit/night.py SPEC.json OUT.mp4 (preview: --preview 0.0,17.4,30). Real night clips from clips/ cut on the VYZEE grid ("cuts"), about 31 s.
