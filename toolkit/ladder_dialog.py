@@ -15,7 +15,10 @@ Spec:
     ...
   ]
 }
-Optional: "start"/"end" per line, "length", "rung", "calm", "audio". Without them the timing is automatic
+Optional: "start"/"end" per line, "length", "rung", "calm", "audio".
+"typing": true (Adriaan 2026-11-20, "typing feel"): before every line after the first, typing dots show for DOTS s at the
+speaker's spot, then the words type in one by one (WORD s each), like a real late night chat. The first line is fully on
+screen from frame 1 (the hook). Each segment then has "text_at" (when the first word lands); rung/calm follow the last one. Without them the timing is automatic
 (reading speed, last answer held about 9 s; about 27 s in total like the approved video).
 All text stays between x 130 and 950: tall phones crop about 100 px off each side of a 9:16 video.
 """
@@ -37,6 +40,7 @@ spec = json.load(open(sys.argv[1]))
 OUT = sys.argv[2]
 PREVIEW = [float(x) for x in sys.argv[4].split(",")] if len(sys.argv) > 4 and sys.argv[3] == "--preview" else None
 segs = spec["lines"]
+TYPING = bool(spec.get("typing")); DOTS, WORD = spec.get("dots", .6), spec.get("word", .09)
 if "start" not in segs[0]:                       # automatic reading timing
     t = 0.0
     for i, s in enumerate(segs):
@@ -44,11 +48,16 @@ if "start" not in segs[0]:                       # automatic reading timing
         last = i == len(segs) - 1
         dur = max(1.8, 0.8 + 0.3 * w) if s["who"] == "you" else max(3.0, 1.2 + 0.3 * w)
         if last: dur = max(9.5, dur + 6.0)
+        if TYPING and i > 0:                     # reading happens while it types: shorter hold after the last word
+            dur = DOTS + WORD * w + ((1.2 + 0.18 * w) if s["who"] == "you" else (1.6 + 0.2 * w))
+            if last: dur = DOTS + WORD * w + 7.5
         s["start"], s["end"] = round(t, 2), round(t + dur, 2); t += dur
     spec.setdefault("length", segs[-1]["end"])
-    spec.setdefault("rung", segs[-1]["start"] + 0.1)
-    spec.setdefault("calm", segs[-1]["start"])
-    spec.setdefault("title_end", 99)
+for i, s_ in enumerate(segs):
+    s_["text_at"] = s_["start"] + (DOTS if TYPING and i > 0 else 0)
+spec.setdefault("rung", segs[-1]["text_at"] + 0.1)
+spec.setdefault("calm", segs[-1]["text_at"])
+spec.setdefault("title_end", 99)
 T_END = spec["length"]
 def S(i): return segs[i]["start"]
 def E(i): return segs[i]["end"]
@@ -238,14 +247,32 @@ def frame(t):
     d.line([XA, ry, XA + 70, ry], fill=GOLD + (230,), width=3)
     for s in segs:
         if not (s["start"] <= t < s["end"]): continue
-        a = (1 if s["start"] == 0 else smooth(s["start"], s["start"] + .2, t)) * ((1 - smooth(s["end"] - .2, s["end"], t)) if s["end"] < T_END - .01 else 1)
-        if s["who"] == "you":
-            lines = wrap(d, s["text"], F_Q, 260)
-            y = 860 - len(lines) * 56
-            for i, ln in enumerate(lines): d.text((135, y + i * 56), ln, font=F_Q, fill=(240, 242, 245, int(255 * a)))
-        else:
-            lines = wrap(d, s["text"], F_A, 290)
-            for i, ln in enumerate(lines): d.text((XA, ry + 40 + i * 56), ln, font=F_A, fill=GOLD + (int(255 * a),))
+        out = (1 - smooth(s["end"] - .2, s["end"], t)) if s["end"] < T_END - .01 else 1
+        you = s["who"] == "you"; col = (240, 242, 245) if you else GOLD
+        if t < s["text_at"]:                     # typing dots
+            a = smooth(s["start"], s["start"] + .12, t) * (1 - smooth(s["text_at"] - .08, s["text_at"], t))
+            x0, y0 = (135, 860 - 40) if you else (XA, ry + 62)
+            for k in range(3):
+                b = .35 + .65 * max(0, math.sin((t - s["start"]) * 9 - k * .9))
+                r = 9 + 3 * b
+                d.ellipse([x0 + 14 + k * 38 - r, y0 - r - 6 * b, x0 + 14 + k * 38 + r, y0 + r - 6 * b], fill=col + (int(235 * a * b),))
+            continue
+        words = s["text"].split()
+        if TYPING and s["text_at"] > 0:
+            shown = min(len(words), 1 + int((t - s["text_at"]) / WORD))
+        else: shown = len(words)
+        a0 = 1 if (s["start"] == 0 or TYPING) else smooth(s["start"], s["start"] + .2, t)
+        f, wd = (F_Q, 260) if you else (F_A, 290)
+        lines = wrap(d, s["text"], f, wd)      # wrap the full line so words never jump while typing
+        y = 860 - len(lines) * 56 if you else ry + 40
+        left = shown
+        for i, ln in enumerate(lines):
+            lw = ln.split(); part = lw[:max(0, left)]; left -= len(lw)
+            if not part: break
+            x = 135 if you else XA
+            for w_ in part:
+                d.text((x, y + i * 56), w_, font=f, fill=col + (int(255 * a0 * out),))
+                x += d.textlength(w_ + " ", font=f)
     reg = txt
     sh = reg.getchannel("A").filter(ImageFilter.GaussianBlur(14)).point(lambda v: min(255, int(v * 2.4)))
     shadow = Image.new("RGBA", reg.size, (0, 0, 0, 255)); shadow.putalpha(sh)
