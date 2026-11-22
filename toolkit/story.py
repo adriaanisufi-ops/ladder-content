@@ -47,10 +47,10 @@ def fit(d, txt, top=66, low=50):
 def block_h(d, txt, sz): return len(V.wrap_lines(d, txt, sz, 760)) * sz * 1.12
 
 def draw(t, d, g, spec, LEN):
-    lines = spec["lines"]; end = spec["end"]; names = spec.get("names", {"a": "THEM", "b": "YOU"})
+    lines = spec["lines"]; end = spec["end"]; names = spec.get("names", {"a": "THEM", "b": "YOU"}); Y = spec.get("text_y", 780)
     if t >= end["t"]:
         a = ease((t - end["t"]) / .5)
-        V.big(g, end["text"], 760, end.get("size", fit(d, end["text"], 74)), a, V.GOLD)
+        V.big(g, end["text"], Y - 20, end.get("size", fit(d, end["text"], 74)), a, V.GOLD)
         return
     cur = max([i for i, l in enumerate(lines) if l["t"] <= t] or [0])
     fade_out = cl((end["t"] - t) / .35)
@@ -60,10 +60,10 @@ def draw(t, d, g, spec, LEN):
         col = V.WHITE if l["who"] == "a" else BLUE
         sz = l.get("size", fit(d, l["text"]))
         if i == cur:
-            a = (1.0 if l["t"] <= 0.05 else ease(k / .3)) * fade_out; y = 780 + (1 - ease(k / .35)) * 18
+            a = (1.0 if l["t"] <= 0.05 else ease(k / .3)) * fade_out; y = Y + (1 - ease(k / .35)) * 18
         else:
             nk = t - lines[cur]["t"]; a = (1 - .65 * ease(nk / .35)) * fade_out
-            y = 780 - ease(nk / .35) * (block_h(d, l["text"], sz) + 105)
+            y = Y - ease(nk / .35) * (block_h(d, l["text"], sz) + 105)
             if lines[cur].get("alone"): a *= cl(1 - nk / .3)
         if a <= .01: continue
         V.text_c(d, names[l["who"]], y - 50, 28, a * .75, col, sp=6)
