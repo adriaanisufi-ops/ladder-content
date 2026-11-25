@@ -1,5 +1,15 @@
 # Lessons (keep adding, newest at the top)
 
+## NEW DEFAULT from 2026-11-25: informative text videos, NO voice (Adriaan: "Geen ai voice. Het moet gewoon video zijn." / "Ik wil een informatief video. Iets wat mensen helpt net zoals mijn boek" / "maak nog zo een video en vanaf nu altijd zulke videos")
+Replaces the warm voice night videos below. Approved examples: toolkit/specs/example-info-rehearsal.json ("You Suffer More in Rehearsal Than in Reality") and toolkit/specs/example-info-say-it.json ("Say It Until It's True").
+- Content: informative, helps people the way his book does. One idea from one book chapter per video (toolkit/reference/book.txt): the problem in a recognisable moment, why it happens, then what to do. Concrete and useful, short lines.
+- No AI voice, no music: "lines": [] and the final file has NO audio track (re-encode with -an). He always puts the same song on it himself in TikTok.
+- Render with toolkit/night.py: night clips, intro desaturated ("sat" .18), colour back on the drop ("sat" 1), warm city aerial at the end, every text item "y": 780, last line gold.
+- RHYTHM (Adriaan 2026-11-25: "Not good rytym. At the most crucial part you did it too fast"): the part after the drop must be SLOWER than the intro, never faster. Intro: a new card every 5 beats (~2.8 s), the question before the drop holds from beat 25 to 31 (3.3 s). From the drop: a card every 6 beats (3.3 s): beats 31, 37, 43, 49, gold at 55 (30.4 s) holding to the end. "length" 35. Cuts follow the cards (0,5,10,15,20,25 | 31,37,43,49 | 55).
+- Card text: hook on screen from frame 0 (max about 9 words); about 40 characters max per card (two or three lines at size 62 to 68), the drop line short and big (size 80).
+- Final file: ffmpeg -i X.mp4 -c:v libx264 -preset slow -crf 23 -pix_fmt yuv420p -movflags +faststart -an OUT.mp4 (about 12 MB).
+- Song: he will always use the same song; which one is not known yet. When he names it, measure it with toolkit/beatmap.py and put the cards on its drop.
+
 ## Ladder dialog is back, as life lessons (Adriaan 2026-11-20: "make videos like this again without ai, i liked these the most")
 - Render like "Juist" with toolkit/ladder_dialog.py, NO typing dots ("i don't like the dots"); lines appear whole. No voice, rain only.
 - Text must hit harder and be relatable: show him the scripts FIRST, he picks. He picked "The unanswered call" (My mom called twice today. I let it ring. / ... / Call her back. She never wanted the version you promised. She wanted you.). He rejected the softer "Stealing back the night" (1 am scrolling).

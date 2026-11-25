@@ -1,0 +1,152 @@
+{
+ "length": 35,
+ "sound": "vyzee",
+ "lines": [],
+ "text": [
+  {
+   "from": 0,
+   "big": "You've had that fight 40 times. In your head.",
+   "y": 780,
+   "size": 62,
+   "to": 5
+  },
+  {
+   "from": 5,
+   "big": "And felt the sting every single time.",
+   "y": 780,
+   "size": 66,
+   "to": 10
+  },
+  {
+   "from": 10,
+   "big": "The real one hasn't even happened yet.",
+   "y": 780,
+   "size": 66,
+   "to": 15
+  },
+  {
+   "from": 15,
+   "big": "And when it does, it's almost always smaller.",
+   "y": 780,
+   "size": 62,
+   "to": 20
+  },
+  {
+   "from": 20,
+   "big": "Your mind makes you pay for pain in advance.",
+   "y": 780,
+   "size": 62,
+   "to": 25
+  },
+  {
+   "from": 25,
+   "big": "So what part of it is actually yours?",
+   "y": 780,
+   "size": 66,
+   "to": 31
+  },
+  {
+   "from": 31,
+   "big": "Split it in two.",
+   "y": 780,
+   "size": 80,
+   "to": 37
+  },
+  {
+   "from": 37,
+   "big": "Yours: your effort. Your words. Your response.",
+   "y": 780,
+   "size": 62,
+   "to": 43
+  },
+  {
+   "from": 43,
+   "big": "Not yours: their reaction. The outcome.",
+   "y": 780,
+   "size": 64,
+   "to": 49
+  },
+  {
+   "from": 49,
+   "big": "Do your part. Let the rest go.",
+   "y": 780,
+   "size": 70,
+   "to": 55
+  },
+  {
+   "from": 55,
+   "big": "Live it once. Not forty times.",
+   "y": 780,
+   "size": 72,
+   "gold": true
+  }
+ ],
+ "cuts": [
+  {
+   "from": 0,
+   "clip": "pex-11372911.mp4",
+   "start": 1,
+   "sat": 0.18
+  },
+  {
+   "from": 5,
+   "clip": "pex-29615708.mp4",
+   "start": 1,
+   "sat": 0.18
+  },
+  {
+   "from": 10,
+   "clip": "pex-35530181.mp4",
+   "start": 1,
+   "sat": 0.18
+  },
+  {
+   "from": 15,
+   "clip": "pex-19001188.mp4",
+   "start": 1,
+   "sat": 0.18
+  },
+  {
+   "from": 20,
+   "clip": "pex-37201214.mp4",
+   "start": 1,
+   "sat": 0.18
+  },
+  {
+   "from": 25,
+   "clip": "pex-11372916.mp4",
+   "start": 1,
+   "sat": 0.18
+  },
+  {
+   "from": 31,
+   "clip": "ladder-src-12.mp4",
+   "start": 1,
+   "sat": 1
+  },
+  {
+   "from": 37,
+   "clip": "ladder-stad-19735541.mp4",
+   "start": 1,
+   "sat": 1
+  },
+  {
+   "from": 43,
+   "clip": "pex-11326269.mp4",
+   "start": 1,
+   "sat": 1
+  },
+  {
+   "from": 49,
+   "clip": "pex-19452742.mp4",
+   "start": 1,
+   "sat": 1
+  },
+  {
+   "from": 55,
+   "clip": "ladder-src-03c.mp4",
+   "start": 1,
+   "sat": 1
+  }
+ ]
+}
