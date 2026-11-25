@@ -1,12 +1,13 @@
 # Lessons (keep adding, newest at the top)
 
 ## NEW DEFAULT from 2026-11-25: informative text videos, NO voice (Adriaan: "Geen ai voice. Het moet gewoon video zijn." / "Ik wil een informatief video. Iets wat mensen helpt net zoals mijn boek" / "maak nog zo een video en vanaf nu altijd zulke videos")
-Replaces the warm voice night videos below. Approved examples: toolkit/specs/example-info-rehearsal.json ("You Suffer More in Rehearsal Than in Reality") and toolkit/specs/example-info-say-it.json ("Say It Until It's True").
+Replaces the warm voice night videos below. Approved example: toolkit/specs/example-info-say-it.json ("Say It Until It's True", the slow 8 card version). toolkit/specs/example-info-rehearsal.json is the older 11 card version: its content is fine but its rhythm is too fast.
 - Content: informative, helps people the way his book does. One idea from one book chapter per video (toolkit/reference/book.txt): the problem in a recognisable moment, why it happens, then what to do. Concrete and useful, short lines.
 - No AI voice, no music: "lines": [] and the final file has NO audio track (re-encode with -an). He always puts the same song on it himself in TikTok.
 - Render with toolkit/night.py: night clips, intro desaturated ("sat" .18), colour back on the drop ("sat" 1), warm city aerial at the end, every text item "y": 780, last line gold.
-- RHYTHM (Adriaan 2026-11-25: "Not good rytym. At the most crucial part you did it too fast"): the part after the drop must be SLOWER than the intro, never faster. Intro: a new card every 5 beats (~2.8 s), the question before the drop holds from beat 25 to 31 (3.3 s). From the drop: a card every 6 beats (3.3 s): beats 31, 37, 43, 49, gold at 55 (30.4 s) holding to the end. "length" 35. Cuts follow the cards (0,5,10,15,20,25 | 31,37,43,49 | 55).
-- Card text: hook on screen from frame 0 (max about 9 words); about 40 characters max per card (two or three lines at size 62 to 68), the drop line short and big (size 80).
+- RHYTHM (Adriaan 2026-11-25, twice: "At the most crucial part you did it too fast", then "why so quick again and again"): SLOW. Only 8 cards, each about 4.4 s (8 beats): beats 0, 8, 15, 23 (question, holds to the drop), 31 (the turn, size 80), 39, 47, then the gold line on 55 (30.4 s) holding to the end. "length" 36. One clip per card, cut on the card changes. Approved: toolkit/specs/example-info-say-it.json.
+- Card text: hook on screen from frame 0; max about 7 words and 40 characters per card (two or three lines at size 64 to 70), the drop line short and big (size 80).
+- NO time attached (Adriaan 2026-11-25: "i don't like time attached to it or like a specific dat"): never days, dates, times of day or deadlines in the text ("by Tuesday", "on Monday", "at 1 am", "this week"). Keep it timeless.
 - Final file: ffmpeg -i X.mp4 -c:v libx264 -preset slow -crf 23 -pix_fmt yuv420p -movflags +faststart -an OUT.mp4 (about 12 MB).
 - Song: he will always use the same song; which one is not known yet. When he names it, measure it with toolkit/beatmap.py and put the cards on its drop.
 

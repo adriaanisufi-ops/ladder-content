@@ -1,45 +1,31 @@
 {
- "length": 35,
+ "length": 36,
  "sound": "vyzee",
  "lines": [],
  "text": [
   {
    "from": 0,
-   "big": "You said it once. Then forgot it by Tuesday.",
+   "big": "You said it once. Then it faded.",
    "y": 780,
-   "size": 62,
-   "to": 5
+   "size": 68,
+   "to": 8
   },
   {
-   "from": 5,
+   "from": 8,
    "big": "A belief you say once is just a sentence.",
    "y": 780,
-   "size": 62,
-   "to": 10
-  },
-  {
-   "from": 10,
-   "big": "It won't hold on the days nobody's watching.",
-   "y": 780,
-   "size": 62,
+   "size": 64,
    "to": 15
   },
   {
    "from": 15,
-   "big": "Your autopilot runs most of your day.",
+   "big": "Your autopilot believes what it hears most.",
    "y": 780,
-   "size": 66,
-   "to": 20
+   "size": 64,
+   "to": 23
   },
   {
-   "from": 20,
-   "big": "And it believes whatever it hears most.",
-   "y": 780,
-   "size": 66,
-   "to": 25
-  },
-  {
-   "from": 25,
+   "from": 23,
    "big": "So what are you telling yourself on repeat?",
    "y": 780,
    "size": 64,
@@ -50,25 +36,18 @@
    "big": "Choose the sentence.",
    "y": 780,
    "size": 80,
-   "to": 37
+   "to": 39
   },
   {
-   "from": 37,
-   "big": "Make it true. Make it short. Make it yours.",
+   "from": 39,
+   "big": "Make it true. Make it short.",
    "y": 780,
-   "size": 62,
-   "to": 43
+   "size": 70,
+   "to": 47
   },
   {
-   "from": 43,
-   "big": "Say it every morning. Say it every night.",
-   "y": 780,
-   "size": 64,
-   "to": 49
-  },
-  {
-   "from": 49,
-   "big": "Out loud. Even when it feels stupid.",
+   "from": 47,
+   "big": "Say it out loud. Again and again.",
    "y": 780,
    "size": 68,
    "to": 55
@@ -89,31 +68,19 @@
    "sat": 0.18
   },
   {
-   "from": 5,
+   "from": 8,
    "clip": "pex-36620620.mp4",
    "start": 1,
    "sat": 0.18
   },
   {
-   "from": 10,
+   "from": 15,
    "clip": "pex-11326150.mp4",
    "start": 1,
    "sat": 0.18
   },
   {
-   "from": 15,
-   "clip": "pex-28552373.mp4",
-   "start": 0.3,
-   "sat": 0.18
-  },
-  {
-   "from": 20,
-   "clip": "pex-11372918.mp4",
-   "start": 1,
-   "sat": 0.18
-  },
-  {
-   "from": 25,
+   "from": 23,
    "clip": "pex-11910743.mp4",
    "start": 1,
    "sat": 0.18
@@ -125,19 +92,13 @@
    "sat": 1
   },
   {
-   "from": 37,
+   "from": 39,
    "clip": "pex-36110813.mp4",
    "start": 1,
    "sat": 1
   },
   {
-   "from": 43,
-   "clip": "pex-10297623.mp4",
-   "start": 1,
-   "sat": 1
-  },
-  {
-   "from": 49,
+   "from": 47,
    "clip": "pex-19220242.mp4",
    "start": 1,
    "sat": 1
