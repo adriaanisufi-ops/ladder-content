@@ -1,5 +1,11 @@
 # Lessons (keep adding, newest at the top)
 
+## Adriaan writes his own scripts again (2026-11-26: "Ik denk dat ik zelf weer meer wil gaan schrijven")
+- He sends a raw thought; Claude edits (critically: cliché openings, distance words like "one/somebody", abstract lines, overlap with log.csv), offers two versions, and renders the ones he picks in the info format above. First one: "Permission to be loved" (let-it-in, love-or-permission), both approved by him.
+- His strongest material is a twist on a familiar idea ("not learning to love yourself, but allowing yourself to be loved"); build the drop on that twist.
+- He also wants the scripts as Obsidian notes (markdown file sent in chat; Claude has no access to his vault).
+- How the daily routine fits this is not decided yet.
+
 ## NEW DEFAULT from 2026-11-25: informative text videos, NO voice (Adriaan: "Geen ai voice. Het moet gewoon video zijn." / "Ik wil een informatief video. Iets wat mensen helpt net zoals mijn boek" / "maak nog zo een video en vanaf nu altijd zulke videos")
 Replaces the warm voice night videos below. Approved example: toolkit/specs/example-info-say-it.json ("Say It Until It's True", the slow 8 card version). toolkit/specs/example-info-rehearsal.json is the older 11 card version: its content is fine but its rhythm is too fast.
 - Content: informative, helps people the way his book does. One idea from one book chapter per video (toolkit/reference/book.txt): the problem in a recognisable moment, why it happens, then what to do. Concrete and useful, short lines.
